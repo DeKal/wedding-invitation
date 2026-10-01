@@ -621,7 +621,8 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 
  ov.querySelector('.gd-send').addEventListener('click',function(){
   var g=GIFTS[selected];
-  var name=(ov.querySelector('.gd-name').value||'').trim()||(window.__anonName?window.__anonName():'Ẩn Danh');
+  var name=(ov.querySelector('.gd-name').value||'').trim();
+  if(!name){var inp=ov.querySelector('.gd-name');inp.focus();if(window.__giftFx&&window.__giftFx.toast)window.__giftFx.toast('Vui lòng nhập tên của bạn');return;}
   var thumb=THUMB+g[0]+'.png';
   close();
   var fx=window.__giftFx;
@@ -702,15 +703,29 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   ],{duration:5000,easing:'linear'});
   anim.onfinish=function(){el.remove();};
  }
- window.__blessing=show;
+ // looping danmu feed (newest items join the loop too)
+ var feed=[];var looping=false;var FEED_MAX=60;
+ function ensureLoop(){
+  if(looping||!feed.length)return;looping=true;
+  var DUR=5000,GAP=300,idx=0;
+  (function tick(){
+   if(!feed.length){looping=false;return;}
+   var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/feed.length));
+   var m=feed[idx%feed.length];show(m.name,m.message);idx++;
+   setTimeout(tick,SPAWN);
+  })();
+ }
+ function addFeed(name,msg){feed.push({name:name,message:msg});if(feed.length>FEED_MAX)feed.shift();ensureLoop();}
+ // public: float now AND keep it looping
+ window.__blessing=function(name,msg){show(name,msg);addFeed(name,msg);};
  window.__giftSeen=window.__giftSeen||{};
  function api(path){return fetch(path).then(function(r){return r.ok?r.json():Promise.reject(r);});}
 
- // show the gd-slide minibar for a gift from any viewer, + note in danmu feed
+ // gd-slide minibar for a gift from any viewer, + loop it in the danmu feed
  function giftPopup(g){
   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
   if(window.__giftSlide)window.__giftSlide(g.name||'Ẩn danh',g.label||'',base+g.gkey+'.png');
-  show(g.name,'Gửi '+(g.label||''));
+  window.__blessing(g.name,'Gửi '+(g.label||''));
  }
 
  Promise.all([
@@ -721,18 +736,15 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   // seed poll cursor to newest known gift so initial load is not replayed as popups
   var lastTs=0;gs.forEach(function(g){if(g.ts>lastTs)lastTs=g.ts;if(g.id)window.__giftSeen[g.id]=1;});
 
-  // combined danmu feed: wishes + gifts, oldest->newest
-  var feed=ws.map(function(w){return {name:w.name,message:w.message,ts:w.ts};})
+  // seed looping feed: wishes + gifts, oldest->newest
+  var seed=ws.map(function(w){return {name:w.name,message:w.message,ts:w.ts};})
     .concat(gs.map(function(g){return {name:g.name,message:'Gửi '+(g.label||''),ts:g.ts};}));
-  feed.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
-  if(feed.length){
-   var DUR=5000,GAP=300;
-   var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/feed.length));
-   var idx=0;
-   (function tick(){var m=feed[idx%feed.length];show(m.name,m.message);idx++;setTimeout(tick,SPAWN);})();
-  }
+  seed.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  seed.forEach(function(m){feed.push({name:m.name,message:m.message});});
+  if(feed.length>FEED_MAX)feed.splice(0,feed.length-FEED_MAX);
+  ensureLoop();
 
-  // poll for new gifts from other viewers and broadcast the slide popup here
+  // poll for new gifts from other viewers: slide popup + join the loop
   setInterval(function(){
    api('/api/gifts?since='+lastTs).then(function(d){
     (d.gifts||[]).forEach(function(g){

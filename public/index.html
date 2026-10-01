@@ -716,14 +716,14 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
    {transform:'translateY(0px)',opacity:1,offset:0.12},
    {transform:'translateY(-150px)',opacity:1,offset:0.82},
    {transform:'translateY(-200px)',opacity:0}
-  ],{duration:5000,easing:'linear'});
+  ],{duration:9000,easing:'linear'});
   anim.onfinish=function(){el.remove();};
  }
  // looping danmu feed (newest items join the loop too)
  var feed=[];var looping=false;var FEED_MAX=60;
  function ensureLoop(){
   if(looping||!feed.length)return;looping=true;
-  var DUR=5000,GAP=300,idx=0;
+  var DUR=9000,GAP=300,idx=0;
   (function tick(){
    if(!feed.length){looping=false;return;}
    var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/feed.length));

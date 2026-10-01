@@ -500,10 +500,22 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  if(elGift)elGift.addEventListener('click',function(){if(window.__openGiftDrawer)window.__openGiftDrawer();else{burst(GIFT,window.innerWidth/2,8,{size:40});bump('gift');}});
  function used(type){try{return localStorage.getItem('wi_react_'+type);}catch(e){return false;}}function mark(type){try{localStorage.setItem('wi_react_'+type,'1');}catch(e){}}function bump(type){if(used(type)){toast('Bạn đã thực hiện hành động này rồi');return false;}mark(type);var el={gift:elGift,heart:elHeart}[type];var b=badge(el);if(b){b.textContent=(parseInt(b.textContent||'0',10)||0)+1;}postReaction(type);return true;}
 
+ // gift: up to 3 per user
+ function giftLeft(){try{return 3-(parseInt(localStorage.getItem('wi_gift_count')||'0',10)||0);}catch(e){return 3;}}
+ function giftBump(){if(giftLeft()<=0){toast('Bạn đã tặng quà tối đa 3 lần');return false;}try{localStorage.setItem('wi_gift_count',String((parseInt(localStorage.getItem('wi_gift_count')||'0',10)||0)+1));}catch(e){}var b=badge(elGift);if(b){b.textContent=(parseInt(b.textContent||'0',10)||0)+1;}postReaction('gift');return true;}
+ // wish: once per user
+ function wishDone(){try{return !!localStorage.getItem('wi_wish_done');}catch(e){return false;}}
+ function wishMark(){try{localStorage.setItem('wi_wish_done','1');}catch(e){}}
+ // remember entered name, reuse across popups
+ function savedName(){try{return localStorage.getItem('wi_name')||'';}catch(e){return '';}}
+ function saveName(n){try{if(n)localStorage.setItem('wi_name',n);}catch(e){}}
+ window.__savedName=savedName;window.__saveName=saveName;
+
  var msg=document.querySelector('.message-box-button');
  if(msg)msg.addEventListener('click',openWish);
 
  function openWish(){
+  if(wishDone()){toast('Bạn đã gửi lời chúc rồi');return;}
   var HEARTLOGO='assets/media/message-heart.9f3f7935.png';
   var ov=document.createElement('div');ov.className='bl-ov';
   ov.innerHTML='<div class="bl-win">'+
@@ -518,15 +530,19 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   document.body.appendChild(ov);
   requestAnimationFrame(function(){ov.classList.add('in');});
   var ta=ov.querySelector('.bl-mess');var nm=ov.querySelector('.bl-name');
-  ta.focus();
+  nm.value=savedName();
+  (nm.value?ta:nm).focus();
   function close(){ov.classList.remove('in');setTimeout(function(){ov.remove();},250);}
   ov.querySelector('.bl-close').onclick=close;
   ov.addEventListener('click',function(e){if(e.target===ov)close();});
   ov.querySelector('.bl-send').onclick=function(){
+   if(wishDone()){toast('Bạn đã gửi lời chúc rồi');close();return;}
    var nmv=(nm.value||'').trim();
    if(!nmv){nm.focus();toast('Vui lòng nhập tên của bạn');return;}
    var t=(ta.value||'').trim();if(!t){ta.focus();toast('Hãy nhập lời chúc');return;}
+   saveName(nmv);
    postWish(nmv,t).then(function(){
+    wishMark();
     close();toast('Cảm ơn lời chúc của bạn!');burst(HAPPY,window.innerWidth/2,8,{size:34});
     if(window.__blessing)window.__blessing(nmv,t);
    }).catch(function(){toast('Gửi thất bại, thử lại sau.');});
@@ -539,7 +555,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   document.body.appendChild(t);setTimeout(function(){t.remove();},2200);
  }
 
- window.__giftFx={burst:burst,bump:bump,toast:toast};
+ window.__giftFx={burst:burst,bump:bump,giftBump:giftBump,toast:toast};
  loadReactions();
 })();
 </script><style id='gift-drawer-css'>
@@ -618,17 +634,16 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  });
  function close(){ov.classList.remove('open');}
  ov.querySelector('.gd-mask').addEventListener('click',close);
- window.__openGiftDrawer=function(){ov.classList.add('open');};
+ window.__openGiftDrawer=function(){var inp=ov.querySelector('.gd-name');if(inp&&!inp.value&&window.__savedName)inp.value=window.__savedName();ov.classList.add('open');};
 
  ov.querySelector('.gd-send').addEventListener('click',function(){
   var g=GIFTS[selected];
   var name=(ov.querySelector('.gd-name').value||'').trim();
   if(!name){var inp=ov.querySelector('.gd-name');inp.focus();if(window.__giftFx&&window.__giftFx.toast)window.__giftFx.toast('Vui lòng nhập tên của bạn');return;}
   var thumb=THUMB+g[0]+'.png';
-  close();
   var fx=window.__giftFx;
-  if(fx){ if(fx.bump('gift')){ slide(name,g[1],thumb); var n=Math.min(6+Math.round(g[2]/900),22); fx.burst(thumb,window.innerWidth/2,n,{size:40+Math.min(g[2]/400,40)}); send(name,g[0],g[1]); } }
-  else { slide(name,g[1],thumb); send(name,g[0],g[1]); }
+  if(fx){ if(fx.giftBump()){ if(window.__saveName)window.__saveName(name); close(); slide(name,g[1],thumb); var n=Math.min(6+Math.round(g[2]/900),22); fx.burst(thumb,window.innerWidth/2,n,{size:40+Math.min(g[2]/400,40)}); send(name,g[0],g[1]); } }
+  else { if(window.__saveName)window.__saveName(name); close(); slide(name,g[1],thumb); send(name,g[0],g[1]); }
  });
 
  // persist gift + broadcast to other viewers; echo into blessing box locally

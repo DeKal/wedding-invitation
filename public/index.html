@@ -525,7 +525,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   ov.querySelector('.bl-send').onclick=function(){
    var nmv=(nm.value||'').trim();
    if(!nmv){nm.focus();toast('Vui lòng nhập tên của bạn');return;}
-   var t=(ta.value||'').trim();if(!t){ta.focus();return;}
+   var t=(ta.value||'').trim();if(!t){ta.focus();toast('Hãy nhập lời chúc');return;}
    postWish(nmv,t).then(function(){
     close();toast('Cảm ơn lời chúc của bạn!');burst(HAPPY,window.innerWidth/2,8,{size:34});
     if(window.__blessing)window.__blessing(nmv,t);

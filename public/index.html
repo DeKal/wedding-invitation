@@ -749,36 +749,42 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   window.__blessing(g.name,'',{label:g.label||'',thumb:thumb});
  }
 
- Promise.all([
-  api('/api/wishes?limit=20').then(function(d){return (d.wishes||[]).slice(0,20);}).catch(function(){return[];}),
-  api('/api/gifts?limit=20').then(function(d){return (d.gifts||[]);}).catch(function(){return[];})
- ]).then(function(res){
-  var ws=res[0],gs=res[1];
-  var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
-  var CUT=Date.now()-86400000; // only show items from the last 24h
-  // seed poll cursor to newest known gift so initial load is not replayed as popups
-  var lastTs=0;gs.forEach(function(g){if(g.ts>lastTs)lastTs=g.ts;if(g.id)window.__giftSeen[g.id]=1;});
+ var lastTs=0;
+ // rebuild the looping feed from the server (wishes + gifts under 1 day old)
+ function refreshFeed(){
+  return Promise.all([
+   api('/api/wishes?limit=20').then(function(d){return (d.wishes||[]).slice(0,20);}).catch(function(){return[];}),
+   api('/api/gifts?limit=20').then(function(d){return (d.gifts||[]);}).catch(function(){return[];})
+  ]).then(function(res){
+   var ws=res[0],gs=res[1];
+   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
+   var CUT=Date.now()-86400000; // only show items from the last 24h
+   // advance poll cursor + mark fetched gifts seen so they are not replayed as popups
+   gs.forEach(function(g){if(g.ts>lastTs)lastTs=g.ts;if(g.id)window.__giftSeen[g.id]=1;});
+   // rebuild feed in place (keeps the running loop's reference)
+   var seed=ws.filter(function(w){return (w.ts||0)>=CUT;}).map(function(w){return {name:w.name,message:w.message,gift:null,ts:w.ts};})
+     .concat(gs.filter(function(g){return (g.ts||0)>=CUT;}).map(function(g){return {name:g.name,message:'',gift:{label:g.label||'',thumb:base+g.gkey+'.png'},ts:g.ts};}));
+   seed.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+   feed.length=0;
+   seed.forEach(function(m){feed.push({name:m.name,message:m.message,gift:m.gift});});
+   if(feed.length>FEED_MAX)feed.splice(0,feed.length-FEED_MAX);
+   ensureLoop();
+  }).catch(function(){});
+ }
+ refreshFeed();
+ setInterval(refreshFeed,60000); // refresh the blessing-box messages every minute
 
-  // seed looping feed: wishes + gifts under 1 day old, oldest->newest
-  var seed=ws.filter(function(w){return (w.ts||0)>=CUT;}).map(function(w){return {name:w.name,message:w.message,gift:null,ts:w.ts};})
-    .concat(gs.filter(function(g){return (g.ts||0)>=CUT;}).map(function(g){return {name:g.name,message:'',gift:{label:g.label||'',thumb:base+g.gkey+'.png'},ts:g.ts};}));
-  seed.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
-  seed.forEach(function(m){feed.push({name:m.name,message:m.message,gift:m.gift});});
-  if(feed.length>FEED_MAX)feed.splice(0,feed.length-FEED_MAX);
-  ensureLoop();
-
-  // poll for new gifts from other viewers: slide popup + join the loop
-  setInterval(function(){
-   api('/api/gifts?since='+lastTs).then(function(d){
-    (d.gifts||[]).forEach(function(g){
-     if(g.ts>lastTs)lastTs=g.ts;
-     if(window.__giftSeen[g.id])return;
-     window.__giftSeen[g.id]=1;
-     giftPopup(g);
-    });
-   }).catch(function(){});
-  },4000);
- }).catch(function(){});
+ // poll for new gifts from other viewers: slide popup + join the loop
+ setInterval(function(){
+  api('/api/gifts?since='+lastTs).then(function(d){
+   (d.gifts||[]).forEach(function(g){
+    if(g.ts>lastTs)lastTs=g.ts;
+    if(window.__giftSeen[g.id])return;
+    window.__giftSeen[g.id]=1;
+    giftPopup(g);
+   });
+  }).catch(function(){});
+ },4000);
 })();
 </script><style id='toolbar-fixed-css'>
 #cinelove-toolbar{position:fixed!important;left:50%!important;right:auto!important;bottom:0!important;top:auto!important;-webkit-transform:translateX(-50%);transform:translateX(-50%);width:100%!important;max-width:500px!important;z-index:4000;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px);}

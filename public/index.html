@@ -457,6 +457,9 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 
  // ---- API helpers ----
  function api(path,opts){return fetch(path,opts).then(function(r){return r.ok?r.json():Promise.reject(r);});}
+ // stable per-browser anonymous label e.g. "Ẩn Danh 4821"
+ function anonName(){var id;try{id=localStorage.getItem('wi_anon_id');if(!id){id=String(Math.floor(1000+Math.random()*9000));localStorage.setItem('wi_anon_id',id);}}catch(e){id=String(Math.floor(1000+Math.random()*9000));}return 'Ẩn Danh '+id;}
+ window.__anonName=anonName;
  function postReaction(type){return api('/api/reactions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:type})}).catch(function(){});}
  function loadReactions(){return api('/api/reactions').then(renderCounts).catch(function(){});}
  function postWish(name,message){return api('/api/wishes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,message:message})});}
@@ -485,7 +488,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 
  // broadcast a gift/heart event to all viewers + local slide + blessing echo
  function broadcastGift(name,gkey,label){
-  name=(name||'').trim()||'Ẩn danh';
+  name=(name||'').trim()||anonName();
   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
   if(window.__giftSlide)window.__giftSlide(name,label,base+gkey+'.png');
   if(window.__blessing)window.__blessing(name,'Gửi '+label);
@@ -618,7 +621,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 
  ov.querySelector('.gd-send').addEventListener('click',function(){
   var g=GIFTS[selected];
-  var name=(ov.querySelector('.gd-name').value||'').trim()||'Ẩn danh';
+  var name=(ov.querySelector('.gd-name').value||'').trim()||(window.__anonName?window.__anonName():'Ẩn Danh');
   var thumb=THUMB+g[0]+'.png';
   close();
   var fx=window.__giftFx;

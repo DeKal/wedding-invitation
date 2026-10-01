@@ -481,10 +481,11 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  }
 
  // ---- button handlers (animation + persist) ----
- if(elHeart)elHeart.addEventListener('click',function(){if(bump('heart')){burst(HEART,window.innerWidth/2,14,{});broadcastGift('[Tên bạn]','biubiu','Bắn tim');}});
+ if(elHeart)elHeart.addEventListener('click',function(){if(bump('heart')){burst(HEART,window.innerWidth/2,14,{});broadcastGift('','biubiu','Bắn tim');}});
 
  // broadcast a gift/heart event to all viewers + local slide + blessing echo
  function broadcastGift(name,gkey,label){
+  name=(name||'').trim()||'Ẩn danh';
   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
   if(window.__giftSlide)window.__giftSlide(name,label,base+gkey+'.png');
   if(window.__blessing)window.__blessing(name,'Gửi '+label);
@@ -617,7 +618,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 
  ov.querySelector('.gd-send').addEventListener('click',function(){
   var g=GIFTS[selected];
-  var name=(ov.querySelector('.gd-name').value||'').trim()||'[Tên bạn]';
+  var name=(ov.querySelector('.gd-name').value||'').trim()||'Ẩn danh';
   var thumb=THUMB+g[0]+'.png';
   close();
   var fx=window.__giftFx;
@@ -705,7 +706,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  // show the gd-slide minibar for a gift from any viewer, + note in danmu feed
  function giftPopup(g){
   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
-  if(window.__giftSlide)window.__giftSlide(g.name||'[Tên bạn]',g.label||'',base+g.gkey+'.png');
+  if(window.__giftSlide)window.__giftSlide(g.name||'Ẩn danh',g.label||'',base+g.gkey+'.png');
   show(g.name,'Gửi '+(g.label||''));
  }
 

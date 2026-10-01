@@ -801,7 +801,48 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  // reposition the danmu box now the button lives at the viewport bottom
  window.dispatchEvent(new Event('resize'));
 })();
-</script><script id='rsvp-fx'>
+</script><style id='rsvp-theme-css'>
+/* Re-skin the RSVP card to the rose wedding theme (overrides inline styles). */
+.rsvp-form-container .rsvp-form{
+ background:rgba(10,14,22,.58)!important;
+ -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+ border:1px solid rgba(212,175,55,.5)!important;
+ border-radius:16px!important;
+ box-shadow:0 8px 30px rgba(0,0,0,.45),0 0 0 1px rgba(212,175,55,.1) inset,0 0 22px rgba(212,175,55,.14)!important;
+ color:#e8e8ea!important;
+}
+.rsvp-form-container .rsvp-form h3{color:#ffd978!important;letter-spacing:.4px;text-shadow:0 0 12px rgba(212,175,55,.4);}
+.rsvp-form-container .rsvp-form label{color:#cfd3da!important;}
+.rsvp-form-container input[name="rsvp-name"]{
+ border:1px solid rgba(212,175,55,.55)!important;
+ border-radius:10px!important;
+ background:rgba(255,255,255,.05)!important;color:#f0f1f3!important;outline:none!important;
+ transition:border-color .2s,box-shadow .2s;
+}
+.rsvp-form-container input[name="rsvp-name"]:focus{
+ border-color:#e8c766!important;box-shadow:0 0 0 3px rgba(212,175,55,.25)!important;
+}
+.rsvp-form-container input[name="rsvp-name"]::placeholder{color:#8a8f99!important;}
+/* radios laid out as 2 columns (side by side) instead of stacked rows */
+.rsvp-form-container .ant-radio-group{width:100%!important;}
+.rsvp-form-container .ant-radio-group > div{flex-direction:row!important;gap:12px!important;}
+.rsvp-form-container .ant-radio-wrapper{flex:1!important;margin:0!important;display:flex!important;align-items:center!important;min-height:40px;color:#e8e8ea!important;}
+.rsvp-form-container .ant-radio-label{color:#e8e8ea!important;padding-inline-start:8px!important;line-height:1.25!important;font-size:calc((var(--form-font-size) - 1) * 1px)!important;}
+/* per-option color: "Có" gold, "Không" stays neutral light */
+.rsvp-form-container .ant-radio-wrapper:has(input[value="yes"]) .ant-radio-label{color:#ffd978!important;}
+.rsvp-form-container .ant-radio-inner{border-color:rgba(212,175,55,.6)!important;background:transparent!important;}
+.rsvp-form-container .ant-radio-wrapper:hover .ant-radio-inner{border-color:#e8c766!important;}
+.rsvp-form-container .ant-radio-checked .ant-radio-inner{border-color:#d4af37!important;background:transparent!important;}
+.rsvp-form-container .ant-radio-checked .ant-radio-inner::after{background-color:#e8c766!important;}
+.rsvp-form-container button[type="submit"]{
+ background:rgba(10,14,22,.72)!important;color:#ffd978!important;border:1px solid rgba(212,175,55,.7)!important;
+ border-radius:22px!important;font-weight:700!important;cursor:pointer;letter-spacing:.3px;
+ box-shadow:0 4px 18px rgba(0,0,0,.4),0 0 14px rgba(212,175,55,.18)!important;
+ transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+}
+.rsvp-form-container button[type="submit"]:hover{transform:translateY(-1px);background:rgba(20,26,38,.82)!important;box-shadow:0 6px 22px rgba(0,0,0,.5),0 0 18px rgba(212,175,55,.3)!important;}
+.rsvp-form-container button[type="submit"]:active{transform:translateY(0);}
+</style><script id='rsvp-fx'>
 (function(){
  var API='/api/rsvps';
  function toast(txt){ if(window.__giftFx&&window.__giftFx.toast){window.__giftFx.toast(txt);return;}
@@ -814,16 +855,15 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   if(!form){setTimeout(init,400);return;}
   var nm=form.querySelector('input[name="rsvp-name"]');
   var wraps=form.querySelectorAll('.ant-radio-wrapper');
-  // read current choice from the actual checked radio / stored pref
   var saved=localStorage.getItem('wi_rsvp_choice');
   function radioOf(w){return w.querySelector('input[type=radio]');}
   function setChoice(val){
    wraps.forEach(function(w){
-    var r=radioOf(w); if(!r)return;
+    var r=radioOf(w);if(!r)return;
     var on=r.value===val;
     r.checked=on;
     w.classList.toggle('ant-radio-wrapper-checked',on);
-    var box=w.querySelector('.ant-radio'); if(box)box.classList.toggle('ant-radio-checked',on);
+    var box=w.querySelector('.ant-radio');if(box)box.classList.toggle('ant-radio-checked',on);
    });
   }
   function getChoice(){
@@ -831,9 +871,9 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
    wraps.forEach(function(w){var r=radioOf(w);if(r&&r.checked)v=r.value;});
    return v;
   }
-  // let guest toggle between the 2 options (static clone has no React handler)
+  // static clone has no React handler, so drive the checked state ourselves
   wraps.forEach(function(w){
-   w.addEventListener('click',function(e){var r=radioOf(w);if(r)setChoice(r.value);});
+   w.addEventListener('click',function(){var r=radioOf(w);if(r)setChoice(r.value);});
   });
   if(saved==='yes'||saved==='no')setChoice(saved);
   // prefill remembered name (shared with gift + lời chúc)

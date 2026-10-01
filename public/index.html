@@ -481,7 +481,17 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  }
 
  // ---- button handlers (animation + persist) ----
- if(elHeart)elHeart.addEventListener('click',function(){if(bump('heart'))burst(HEART,window.innerWidth/2,14,{});});
+ if(elHeart)elHeart.addEventListener('click',function(){if(bump('heart')){burst(HEART,window.innerWidth/2,14,{});broadcastGift('[Tên bạn]','biubiu','Bắn tim');}});
+
+ // broadcast a gift/heart event to all viewers + local slide + blessing echo
+ function broadcastGift(name,gkey,label){
+  var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
+  if(window.__giftSlide)window.__giftSlide(name,label,base+gkey+'.png');
+  if(window.__blessing)window.__blessing(name,'Gửi '+label);
+  api('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,gkey:gkey,label:label})})
+   .then(function(d){if(d&&d.gift&&window.__giftSeen)window.__giftSeen[d.gift.id]=1;})
+   .catch(function(){});
+ }
  
  if(elGift)elGift.addEventListener('click',function(){if(window.__openGiftDrawer)window.__openGiftDrawer();else{burst(GIFT,window.innerWidth/2,8,{size:40});bump('gift');}});
  function used(type){try{return localStorage.getItem('wi_react_'+type);}catch(e){return false;}}function mark(type){try{localStorage.setItem('wi_react_'+type,'1');}catch(e){}}function bump(type){if(used(type)){toast('Bạn đã thực hiện hành động này rồi');return false;}mark(type);var el={gift:elGift,heart:elHeart}[type];var b=badge(el);if(b){b.textContent=(parseInt(b.textContent||'0',10)||0)+1;}postReaction(type);return true;}
@@ -700,8 +710,8 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  }
 
  Promise.all([
-  api('/api/wishes?limit=50').then(function(d){return (d.wishes||[]).slice(0,50);}).catch(function(){return[];}),
-  api('/api/gifts?limit=50').then(function(d){return (d.gifts||[]);}).catch(function(){return[];})
+  api('/api/wishes?limit=20').then(function(d){return (d.wishes||[]).slice(0,20);}).catch(function(){return[];}),
+  api('/api/gifts?limit=20').then(function(d){return (d.gifts||[]);}).catch(function(){return[];})
  ]).then(function(res){
   var ws=res[0],gs=res[1];
   // seed poll cursor to newest known gift so initial load is not replayed as popups

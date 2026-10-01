@@ -779,4 +779,16 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   },4000);
  }).catch(function(){});
 })();
+</script><style id='toolbar-fixed-css'>
+#cinelove-toolbar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;z-index:4000;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px);}
+#cinelove-toolbar .toolbar{padding-left:calc(0.5rem + env(safe-area-inset-left,0px));padding-right:calc(0.5rem + env(safe-area-inset-right,0px));}
+</style><script id='toolbar-fixed'>
+(function(){
+ // Toolbar is absolute inside the tall zoomed canvas, so it only appears at the
+ // very bottom and the phone nav bar can cover it. Lift it out to the viewport.
+ var tb=document.getElementById('cinelove-toolbar');
+ if(tb&&tb.parentNode!==document.body)document.body.appendChild(tb);
+ // reposition the danmu box now the button lives at the viewport bottom
+ window.dispatchEvent(new Event('resize'));
+})();
 </script></body></html>

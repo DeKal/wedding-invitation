@@ -424,7 +424,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  if(document.readyState!=='loading')init();else document.addEventListener('DOMContentLoaded',init);
 })();
 </script>
-<script id='zoom-fit'>(function(){function fit(){var el=document.getElementById('root-page-container');if(!el)return;var w=window.innerWidth;var z=(w>=1366)?(w*0.35)/500:(w>=768)?(w*0.60)/500:(w/500);el.style.zoom=z;}window.addEventListener('resize',fit);fit();})();</script><script id='toolbar-fx'>
+<script id='zoom-fit'>(function(){function fit(){var el=document.getElementById('root-page-container');if(!el)return;var w=document.documentElement.clientWidth||window.innerWidth;var z=(w>=1366)?(w*0.35)/500:(w>=768)?(w*0.60)/500:(w/500);el.style.zoom=z;}window.addEventListener('resize',fit);fit();})();</script><script id='toolbar-fx'>
 (function(){
  var HEART='assets/remote/assets.cinelove.me/gifts/thumb/biubiu.png';
  var LIKE='assets/media/like.ea5798c7.png';

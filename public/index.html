@@ -490,35 +490,30 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  if(msg)msg.addEventListener('click',openWish);
 
  function openWish(){
-  var ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:4000;display:flex;align-items:center;justify-content:center';
-  ov.innerHTML='<div style="background:#fff;border-radius:14px;padding:18px;width:min(90vw,380px);max-height:84vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.4);font-family:sans-serif">\
-<div style="font-size:16px;font-weight:600;margin-bottom:10px;color:#222">Gửi lời chúc</div>\
-<input data-name placeholder="Tên của bạn (tuỳ chọn)" style="width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;padding:8px;font-size:14px;margin-bottom:8px"/>\
-<textarea data-msg rows="3" placeholder="Nhập lời chúc..." style="width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;padding:8px;font-size:14px;resize:none"></textarea>\
-<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">\
-<button data-x style="border:none;background:#eee;color:#444;padding:8px 14px;border-radius:8px;cursor:pointer">Đóng</button>\
-<button data-ok style="border:none;background:#58c5fd;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer">Gửi</button></div>\
-<div data-list style="margin-top:14px;border-top:1px solid #eee;padding-top:10px"></div></div>';
+  var HEARTLOGO='assets/media/message-heart.9f3f7935.png';
+  var ov=document.createElement('div');ov.className='bl-ov';
+  ov.innerHTML='<div class="bl-win">'+
+    '<img class="bl-logo" src="'+HEARTLOGO+'" alt="">'+
+    '<span class="bl-close">×</span>'+
+    '<div class="bl-tit">Lời chúc</div>'+
+    '<div class="bl-cont">'+
+      '<div class="bl-info"><input class="bl-name" maxlength="25" type="text" placeholder="Tên của bạn"></div>'+
+      '<div class="bl-info"><textarea class="bl-mess" placeholder="Lời chúc của bạn"></textarea></div>'+
+    '</div>'+
+    '<button class="bl-send">Gửi Lời Chúc</button></div>';
   document.body.appendChild(ov);
-  var ta=ov.querySelector('[data-msg]');var nm=ov.querySelector('[data-name]');var list=ov.querySelector('[data-list]');
+  requestAnimationFrame(function(){ov.classList.add('in');});
+  var ta=ov.querySelector('.bl-mess');var nm=ov.querySelector('.bl-name');
   ta.focus();
-  function close(){ov.remove();}
-  ov.querySelector('[data-x]').onclick=close;
+  function close(){ov.classList.remove('in');setTimeout(function(){ov.remove();},250);}
+  ov.querySelector('.bl-close').onclick=close;
   ov.addEventListener('click',function(e){if(e.target===ov)close();});
-  function renderList(ws){
-   if(!ws.length){list.innerHTML='<div style="color:#999;font-size:13px">Chưa có lời chúc nào.</div>';return;}
-   list.innerHTML=ws.map(function(w){
-    var who=(w.name||'Ẩn danh');
-    return '<div style="margin-bottom:10px"><div style="font-weight:600;font-size:13px;color:#333">'+esc(who)+'</div><div style="font-size:13px;color:#555;white-space:pre-wrap">'+esc(w.message)+'</div></div>';
-   }).join('');
-  }
-  loadWishes().then(renderList);
-  ov.querySelector('[data-ok]').onclick=function(){
-   var t=ta.value.trim();if(!t)return;
-   postWish(nm.value.trim(),t).then(function(){
-    ta.value='';toast('Cảm ơn lời chúc của bạn!');burst(HAPPY,window.innerWidth/2,8,{size:34});
-    return loadWishes().then(renderList);
+  ov.querySelector('.bl-send').onclick=function(){
+   var t=(ta.value||'').trim();if(!t){ta.focus();return;}
+   var nmv=(nm.value||'').trim();
+   postWish(nmv,t).then(function(){
+    close();toast('Cảm ơn lời chúc của bạn!');burst(HAPPY,window.innerWidth/2,8,{size:34});
+    if(window.__blessing)window.__blessing(nmv,t);
    }).catch(function(){toast('Gửi thất bại, thử lại sau.');});
   };
  }
@@ -548,7 +543,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 .gd-cell{border-radius:10px;padding:8px 4px 6px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s,background .15s;}
 .gd-cell:hover{background:#faf7f8;}
 .gd-cell.active{border-color:#ff6f91;background:#fff2f5;}
-.gd-cell img.gd-thumb{width:52px;height:52px;object-fit:contain;}
+.gd-cell img.gd-thumb{width:52px;height:52px;object-fit:contain;display:block;margin:0 auto;}
 .gd-cell .gd-title{font-size:12px;margin-top:2px;color:#333;line-height:1.2;min-height:26px;display:flex;align-items:center;justify-content:center;}
 .gd-cell .gd-price{font-size:12px;color:#f0a020;display:flex;align-items:center;justify-content:center;gap:3px;margin-top:1px;font-weight:600;}
 .gd-cell .gd-price img{width:14px;height:14px;}
@@ -557,8 +552,9 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 .gd-tip{font-size:12px;color:#999;margin-top:8px;text-align:center;line-height:1.35;}
 /* name + send (give-username / gift_input / cinelove-btn) */
 .gd-row{margin-top:10px;display:flex;gap:10px;align-items:center;justify-content:space-between;width:100%;}
-.gd-row input{flex:1;min-width:0;background:#f3f3f5;border:1px solid #e3e3e8;border-radius:20px;padding:0 14px;height:40px;color:#333;font-size:14px;outline:none;}
+.gd-row input{flex:1;min-width:0;background:transparent;border:1px solid rgba(237,85,102,.4);border-radius:9px;padding:0 10px;height:50px;color:#333;font-size:16px;outline:none;font-family:inherit;box-sizing:border-box;}
 .gd-row input::placeholder{color:#aaa;}
+.gd-row input:focus{outline:none;box-shadow:none;border-color:rgba(237,85,102,.4);-webkit-tap-highlight-color:transparent;}
 .gd-send{height:40px;padding:0 24px;border:none;border-radius:20px;background:linear-gradient(90deg,#ff8aab,#ff5a7a);color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
 .gd-send:active{filter:brightness(.95);}
 /* mini slide-in notice */
@@ -589,8 +585,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  var cells=GIFTS.map(function(g,i){
   return '<div class="gd-cell'+(i===0?' active':'')+'" data-i="'+i+'">'+
     '<img class="gd-thumb" src="'+THUMB+g[0]+'.png" alt="'+g[1]+'">'+
-    '<div class="gd-title">'+g[1]+'</div>'+
-    '<div class="gd-price">'+g[2]+'<img src="'+COIN+'" alt="coin"></div></div>';
+    '<div class="gd-title">'+g[1]+'</div></div>';
  }).join('');
  ov.innerHTML='<div class="gd-mask"></div><div id="gd-sheet">'+
    '<div class="gd-head"><div class="gd-tab">Tặng Quà <img class="gd-arrow" src="'+ARROW+'"></div></div>'+
@@ -628,5 +623,69 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   setTimeout(function(){s.classList.remove('in');setTimeout(function(){s.remove();},450);},2600);
  }
  function esc(x){return (x||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+})();
+</script><style id='blessing-css'>
+.bl-ov{position:fixed;inset:0;z-index:4600;background:rgba(0,0,0,0);transition:background .25s;}
+.bl-ov.in{background:rgba(0,0,0,.45);}
+.bl-win{position:absolute;left:50%;bottom:0;transform:translate(-50%,100%);transition:transform .3s cubic-bezier(.2,.7,.3,1);width:min(100vw,480px);min-height:20rem;background:#fff;border-radius:.5rem .5rem 0 0;box-sizing:border-box;padding:0 18px 22px;text-align:center;font-family:sans-serif;}
+.bl-ov.in .bl-win{transform:translate(-50%,0);}
+.bl-logo{position:absolute;width:140px;height:66px;top:-21px;left:50%;transform:translateX(-50%);object-fit:contain;}
+.bl-close{position:absolute;top:12px;right:16px;font-size:20px;line-height:1;color:#999;cursor:pointer;}
+.bl-tit{margin-top:57px;font-size:21px;font-weight:600;color:#333;}
+.bl-cont{text-align:left;margin-top:16px;}
+.bl-info{margin-bottom:10px;}
+.bl-name,.bl-mess{width:100%;box-sizing:border-box;color:#333;border:1px solid rgba(237,85,102,.4);border-radius:9px;font-size:16px;outline:none;background:transparent;font-family:inherit;}
+.bl-name{height:50px;padding:0 10px;}
+.bl-mess{min-height:96px;padding:10px;resize:none;}
+.bl-name:focus,.bl-mess:focus{outline:none;box-shadow:none;border-color:rgba(237,85,102,.4);-webkit-tap-highlight-color:transparent;}
+.bl-send{margin:25px auto 0;width:90%;height:46px;min-width:100px;display:flex;align-items:center;justify-content:center;gap:5px;background:#ed5566;color:#fff;border:none;border-radius:40px;font-size:1rem;cursor:pointer;transition:.3s;}
+.bl-send:active{filter:brightness(.95);}
+</style><style id='blessing-box-css'>
+#blessing-box{position:fixed;left:16px;bottom:58px;width:285px;max-width:72vw;height:180px;overflow:hidden;z-index:1000;pointer-events:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+#blessing-box .blessing-message{position:absolute;left:0;bottom:0;font-size:11px;color:#fff;min-height:28px;line-height:14px;border-radius:7px;padding:2px 10px;display:flex;text-align:left;align-items:center;justify-content:center;background:rgba(225,117,117,.5);box-sizing:border-box;max-width:100%;will-change:transform,opacity;}
+#blessing-box .blessing-text{word-break:break-word;}
+#blessing-box .blessing-text strong{font-weight:600;}
+</style><script id='blessing-box-fx'>
+(function(){
+ var box=document.createElement('div');box.id='blessing-box';
+ document.body.appendChild(box);
+ function place(){
+  var btn=document.querySelector('.message-box-button');
+  if(!btn)return;
+  var r=btn.getBoundingClientRect();
+  if(!r.width){return;}
+  var pl=parseFloat(getComputedStyle(btn).paddingLeft)||0;
+  var x=r.left+pl;
+  box.style.left=Math.round(x)+'px';
+  box.style.bottom=Math.round(window.innerHeight-r.top+8)+'px';
+  box.style.width=Math.min(285,Math.round(window.innerWidth-x-8))+'px';
+ }
+ place();
+ window.addEventListener('resize',place);
+ [250,800,1600].forEach(function(d){setTimeout(place,d);});
+ function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+ function show(name,msg){
+  var el=document.createElement('div');el.className='blessing-message';
+  el.innerHTML='<span class="blessing-text"><strong>'+esc(name||'Ẩn danh')+'</strong>: '+esc(msg)+'</span>';
+  box.appendChild(el);
+  var anim=el.animate([
+   {transform:'translateY(14px)',opacity:0},
+   {transform:'translateY(0px)',opacity:1,offset:0.12},
+   {transform:'translateY(-150px)',opacity:1,offset:0.82},
+   {transform:'translateY(-200px)',opacity:0}
+  ],{duration:5000,easing:'linear'});
+  anim.onfinish=function(){el.remove();};
+ }
+ window.__blessing=show;
+ function api(path){return fetch(path).then(function(r){return r.ok?r.json():Promise.reject(r);});}
+ api('/api/wishes?limit=50').then(function(d){
+  var ws=(d.wishes||[]).slice(0,50);
+  if(!ws.length)return;
+  var DUR=5000,GAP=300;
+  var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/ws.length));
+  var idx=0;
+  function tick(){var w=ws[idx%ws.length];show(w.name,w.message);idx++;setTimeout(tick,SPAWN);}
+  tick();
+ }).catch(function(){});
 })();
 </script></body></html>

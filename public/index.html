@@ -730,8 +730,9 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   var DUR=9000,GAP=300,idx=0;
   (function tick(){
    if(!feed.length){looping=false;return;}
-   // more items -> a bit slower, but kept in a tight band (~6 down to ~3.5 pills)
-   var SPAWN=Math.max(1500,Math.min(2600,1200+70*feed.length));
+   // <=6 items: space them to show each once (no duplicating to fill the band).
+   // >6 items: throttle so at most ~6 float at once, a bit slower as count grows.
+   var SPAWN=feed.length<=6?Math.round(DUR/feed.length):Math.min(2600,Math.max(1500,1200+70*feed.length));
    var m=feed[idx%feed.length];show(m.name,m.message,m.gift);idx++;
    setTimeout(tick,SPAWN);
   })();
@@ -884,10 +885,23 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   // prefill remembered name (shared with gift + lời chúc)
   if(nm&&!nm.value&&window.__savedName){var sn=window.__savedName();if(sn)nm.value=sn;}
 
+  var btn=form.querySelector('button[type="submit"]');
+  function lock(){if(!btn)return;btn.disabled=true;btn.style.display='none';
+   var grp=form.querySelector('.ant-radio-group');var fld=grp&&grp.parentElement;if(fld)fld.style.display='none';}
+  function showConfirm(att){
+   var c=form.querySelector('#rsvp-confirm');
+   if(!c){c=document.createElement('div');c.id='rsvp-confirm';
+    c.style.cssText='margin-top:12px;padding:10px 12px;border:1px solid rgba(212,175,55,.5);border-radius:12px;background:rgba(212,175,55,.12);color:#fff;font-size:14px;text-align:center;line-height:1.35;';
+    form.appendChild(c);}
+   c.innerHTML='✓ Đã nhận xác nhận của bạn'+(att?('<br>'+(att==='yes'?'Rất mong được gặp bạn tại lễ cưới ❤':'Rất tiếc bạn không thể tham dự')):'');
+  }
+  // already confirmed in a previous visit -> keep it locked + show confirmation
+  if(localStorage.getItem('wi_rsvp_id')){lock();showConfirm(localStorage.getItem('wi_rsvp_choice'));}
+
   var sending=false;
   form.addEventListener('submit',function(e){
    e.preventDefault();
-   if(sending)return;
+   if(sending||(btn&&btn.disabled))return;
    var name=(nm&&nm.value||'').trim();
    if(!name){if(nm)nm.focus();toast('Vui lòng nhập tên của bạn');return;}
    var attending=getChoice();
@@ -902,6 +916,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
      if(d&&d.rsvp&&d.rsvp.id)localStorage.setItem('wi_rsvp_id',d.rsvp.id);
      localStorage.setItem('wi_rsvp_choice',attending);
      if(window.__saveName)window.__saveName(name);
+     lock();showConfirm(attending);
      toast(had?'Đã cập nhật phản hồi của bạn':(attending==='yes'?'Cảm ơn! Hẹn gặp bạn tại lễ cưới ❤':'Đã ghi nhận, rất tiếc bạn không tham dự được'));
     })
     .catch(function(){sending=false;toast('Gửi thất bại, thử lại sau.');});

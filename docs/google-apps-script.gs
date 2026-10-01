@@ -1,24 +1,17 @@
 /**
- * Google Apps Script web app that receives RSVP / wish / gift records from the
- * wedding site and appends them to tabs in THIS spreadsheet.
+ * Google Apps Script web app for the wedding site.
+ * Logs every action to ONE of TWO tabs:
  *
- * SETUP
- * 1. Create a Google Sheet.
- * 2. Extensions > Apps Script. Delete the default code, paste this file.
- * 3. Deploy > New deployment > type "Web app".
- *      - Execute as: Me
- *      - Who has access: Anyone
- *    Copy the Web app URL (ends in /exec).
- * 4. Put that URL in the SHEETS_WEBHOOK_URL env var:
- *      - Local: add to clone-2-vercel/.env
- *      - Vercel: Project Settings > Environment Variables
- * 5. Redeploy the site (or restart dev-server). Done.
+ *   "RSVP"      -> Xác nhận tham dự only. Columns: Timestamp | Name | Attending | Id
+ *                  (upserted by Id so switching Có/Không updates the same row)
+ *   "Hoạt động" -> wishes, gifts and bắn tim. Columns: Timestamp | Action | Name | Detail | Id
+ *                    Lời chúc -> Detail = message
+ *                    Tặng quà -> Detail = gift name
+ *                    Bắn tim  -> Detail = ""
  *
- * Tabs (auto-created with headers on first write):
- *   RSVP   : Timestamp | Name | Attending | Id   (upserted by Id so switching
- *            yes/no updates the same row instead of duplicating)
- *   Wishes : Timestamp | Name | Message | Id
- *   Gifts  : Timestamp | Name | Gift | GiftKey | Id
+ * SETUP (replace your current code with this, then redeploy a NEW version):
+ *   Deploy > Manage deployments > edit (pencil) > Version: New version > Deploy.
+ *   Access must be "Anyone". URL stays the same.
  */
 function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -27,13 +20,11 @@ function doPost(e) {
 
   if (d.type === 'rsvp') {
     var sh = sheet_(ss, 'RSVP', ['Timestamp', 'Name', 'Attending', 'Id']);
-    upsert_(sh, 4, d.id, [when, d.name || '', d.attending || '', d.id || '']);
-  } else if (d.type === 'wish') {
-    sheet_(ss, 'Wishes', ['Timestamp', 'Name', 'Message', 'Id'])
-      .appendRow([when, d.name || '', d.message || '', d.id || '']);
-  } else if (d.type === 'gift') {
-    sheet_(ss, 'Gifts', ['Timestamp', 'Name', 'Gift', 'GiftKey', 'Id'])
-      .appendRow([when, d.name || '', d.label || '', d.gkey || '', d.id || '']);
+    var attending = d.attending === 'no' ? 'Không tham dự' : 'Có tham dự';
+    upsert_(sh, 4, d.id, [when, d.name || '', attending, d.id || '']);
+  } else {
+    var sh2 = sheet_(ss, 'Hoạt động', ['Timestamp', 'Action', 'Name', 'Detail', 'Id']);
+    sh2.appendRow([when, d.action || d.type || '', d.name || '', d.detail || '', d.id || '']);
   }
 
   return ContentService

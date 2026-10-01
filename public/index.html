@@ -491,7 +491,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   name=(name||'').trim()||anonName();
   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
   if(window.__giftSlide)window.__giftSlide(name,label,base+gkey+'.png');
-  if(window.__blessing)window.__blessing(name,'Gửi '+label);
+  if(window.__blessing)window.__blessing(name,'',{label:label,thumb:base+gkey+'.png'});
   api('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,gkey:gkey,label:label})})
    .then(function(d){if(d&&d.gift&&window.__giftSeen)window.__giftSeen[d.gift.id]=1;})
    .catch(function(){});
@@ -648,7 +648,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 
  // persist gift + broadcast to other viewers; echo into blessing box locally
  function send(name,gkey,label){
-  if(window.__blessing)window.__blessing(name,'Gửi '+label);
+  if(window.__blessing)window.__blessing(name,'',{label:label,thumb:THUMB+gkey+'.png'});
   fetch('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,gkey:gkey,label:label})})
    .then(function(r){return r.ok?r.json():null;})
    .then(function(d){if(d&&d.gift&&window.__giftSeen)window.__giftSeen[d.gift.id]=1;})
@@ -688,6 +688,7 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
 #blessing-box .blessing-message{position:absolute;left:0;bottom:0;font-size:11px;color:#fff;min-height:28px;line-height:14px;border-radius:7px;padding:2px 10px;display:flex;text-align:left;align-items:center;justify-content:center;background:rgba(225,117,117,.5);box-sizing:border-box;max-width:100%;will-change:transform,opacity;}
 #blessing-box .blessing-text{word-break:break-word;}
 #blessing-box .blessing-text strong{font-weight:600;}
+#blessing-box .bl-gift-ic{width:15px;height:15px;object-fit:contain;vertical-align:middle;margin-left:3px;display:inline-block;}
 </style><script id='blessing-box-fx'>
 (function(){
  var box=document.createElement('div');box.id='blessing-box';
@@ -707,9 +708,12 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  window.addEventListener('resize',place);
  [250,800,1600].forEach(function(d){setTimeout(place,d);});
  function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
- function show(name,msg){
+ function show(name,msg,gift){
   var el=document.createElement('div');el.className='blessing-message';
-  el.innerHTML='<span class="blessing-text"><strong>'+esc(name||'Ẩn danh')+'</strong>: '+esc(msg)+'</span>';
+  var inner='<strong>'+esc(name||'Ẩn danh')+'</strong>: ';
+  if(gift){inner+='Gửi <strong>'+esc(gift.label||'')+'</strong>'+(gift.thumb?' <img class="bl-gift-ic" src="'+gift.thumb+'" alt="">':'');}
+  else{inner+=esc(msg);}
+  el.innerHTML='<span class="blessing-text">'+inner+'</span>';
   box.appendChild(el);
   var anim=el.animate([
    {transform:'translateY(14px)',opacity:0},
@@ -727,21 +731,22 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   (function tick(){
    if(!feed.length){looping=false;return;}
    var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/feed.length));
-   var m=feed[idx%feed.length];show(m.name,m.message);idx++;
+   var m=feed[idx%feed.length];show(m.name,m.message,m.gift);idx++;
    setTimeout(tick,SPAWN);
   })();
  }
- function addFeed(name,msg){feed.push({name:name,message:msg});if(feed.length>FEED_MAX)feed.shift();ensureLoop();}
- // public: float now AND keep it looping
- window.__blessing=function(name,msg){show(name,msg);addFeed(name,msg);};
+ function addFeed(name,msg,gift){feed.push({name:name,message:msg,gift:gift||null});if(feed.length>FEED_MAX)feed.shift();ensureLoop();}
+ // public: float now AND keep it looping. gift = {label,thumb} for gift items
+ window.__blessing=function(name,msg,gift){show(name,msg,gift);addFeed(name,msg,gift);};
  window.__giftSeen=window.__giftSeen||{};
  function api(path){return fetch(path).then(function(r){return r.ok?r.json():Promise.reject(r);});}
 
  // gd-slide minibar for a gift from any viewer, + loop it in the danmu feed
  function giftPopup(g){
   var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
-  if(window.__giftSlide)window.__giftSlide(g.name||'Ẩn danh',g.label||'',base+g.gkey+'.png');
-  window.__blessing(g.name,'Gửi '+(g.label||''));
+  var thumb=base+g.gkey+'.png';
+  if(window.__giftSlide)window.__giftSlide(g.name||'Ẩn danh',g.label||'',thumb);
+  window.__blessing(g.name,'',{label:g.label||'',thumb:thumb});
  }
 
  Promise.all([
@@ -749,14 +754,15 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   api('/api/gifts?limit=20').then(function(d){return (d.gifts||[]);}).catch(function(){return[];})
  ]).then(function(res){
   var ws=res[0],gs=res[1];
+  var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
   // seed poll cursor to newest known gift so initial load is not replayed as popups
   var lastTs=0;gs.forEach(function(g){if(g.ts>lastTs)lastTs=g.ts;if(g.id)window.__giftSeen[g.id]=1;});
 
   // seed looping feed: wishes + gifts, oldest->newest
-  var seed=ws.map(function(w){return {name:w.name,message:w.message,ts:w.ts};})
-    .concat(gs.map(function(g){return {name:g.name,message:'Gửi '+(g.label||''),ts:g.ts};}));
+  var seed=ws.map(function(w){return {name:w.name,message:w.message,gift:null,ts:w.ts};})
+    .concat(gs.map(function(g){return {name:g.name,message:'',gift:{label:g.label||'',thumb:base+g.gkey+'.png'},ts:g.ts};}));
   seed.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
-  seed.forEach(function(m){feed.push({name:m.name,message:m.message});});
+  seed.forEach(function(m){feed.push({name:m.name,message:m.message,gift:m.gift});});
   if(feed.length>FEED_MAX)feed.splice(0,feed.length-FEED_MAX);
   ensureLoop();
 

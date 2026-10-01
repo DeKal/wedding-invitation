@@ -1,0 +1,14 @@
+{
+  "name": "thiep-cuoi-6-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Thiệp cưới 6 wedding invitation — static page + Vercel serverless API with persistent wishes and reactions.",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}

@@ -1,4 +1,5 @@
 import { addGift, listGifts } from '../lib/store.js';
+import { mirror } from '../lib/sheet.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,6 +28,7 @@ export default async function handler(req, res) {
         label,
         ts: Date.now(),
       });
+      await mirror('gift', entry);
       return res.status(201).json({ gift: entry });
     }
 

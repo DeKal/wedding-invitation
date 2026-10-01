@@ -1,4 +1,5 @@
 import { addRsvp, listRsvps } from '../lib/store.js';
+import { mirror } from '../lib/sheet.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,6 +21,7 @@ export default async function handler(req, res) {
       const id = (body.id || '').toString().trim() || cryptoId();
       if (!name) return res.status(400).json({ error: 'name required' });
       const entry = await addRsvp({ id, name, attending, ts: Date.now() });
+      await mirror('rsvp', entry);
       return res.status(201).json({ rsvp: entry });
     }
 

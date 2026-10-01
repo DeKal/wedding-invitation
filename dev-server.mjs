@@ -41,6 +41,7 @@ const handlers = {
   '/api/wishes': () => import('./api/wishes.js'),
   '/api/reactions': () => import('./api/reactions.js'),
   '/api/gifts': () => import('./api/gifts.js'),
+  '/api/rsvps': () => import('./api/rsvps.js'),
 };
 
 const server = http.createServer(async (req, res) => {

@@ -801,4 +801,67 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
  // reposition the danmu box now the button lives at the viewport bottom
  window.dispatchEvent(new Event('resize'));
 })();
+</script><script id='rsvp-fx'>
+(function(){
+ var API='/api/rsvps';
+ function toast(txt){ if(window.__giftFx&&window.__giftFx.toast){window.__giftFx.toast(txt);return;}
+  var t=document.createElement('div');t.textContent=txt;
+  t.style.cssText='position:fixed;left:50%;top:16%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 16px;border-radius:20px;z-index:5000;font-family:sans-serif;font-size:14px';
+  document.body.appendChild(t);setTimeout(function(){t.remove();},2200);
+ }
+ function init(){
+  var form=document.querySelector('.rsvp-form-container form');
+  if(!form){setTimeout(init,400);return;}
+  var nm=form.querySelector('input[name="rsvp-name"]');
+  var wraps=form.querySelectorAll('.ant-radio-wrapper');
+  // read current choice from the actual checked radio / stored pref
+  var saved=localStorage.getItem('wi_rsvp_choice');
+  function radioOf(w){return w.querySelector('input[type=radio]');}
+  function setChoice(val){
+   wraps.forEach(function(w){
+    var r=radioOf(w); if(!r)return;
+    var on=r.value===val;
+    r.checked=on;
+    w.classList.toggle('ant-radio-wrapper-checked',on);
+    var box=w.querySelector('.ant-radio'); if(box)box.classList.toggle('ant-radio-checked',on);
+   });
+  }
+  function getChoice(){
+   var v='yes';
+   wraps.forEach(function(w){var r=radioOf(w);if(r&&r.checked)v=r.value;});
+   return v;
+  }
+  // let guest toggle between the 2 options (static clone has no React handler)
+  wraps.forEach(function(w){
+   w.addEventListener('click',function(e){var r=radioOf(w);if(r)setChoice(r.value);});
+  });
+  if(saved==='yes'||saved==='no')setChoice(saved);
+  // prefill remembered name (shared with gift + lời chúc)
+  if(nm&&!nm.value&&window.__savedName){var sn=window.__savedName();if(sn)nm.value=sn;}
+
+  var sending=false;
+  form.addEventListener('submit',function(e){
+   e.preventDefault();
+   if(sending)return;
+   var name=(nm&&nm.value||'').trim();
+   if(!name){if(nm)nm.focus();toast('Vui lòng nhập tên của bạn');return;}
+   var attending=getChoice();
+   var id=localStorage.getItem('wi_rsvp_id')||'';
+   sending=true;
+   fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id:id,name:name,attending:attending})})
+    .then(function(r){return r.ok?r.json():Promise.reject();})
+    .then(function(d){
+     sending=false;
+     var had=!!id;
+     if(d&&d.rsvp&&d.rsvp.id)localStorage.setItem('wi_rsvp_id',d.rsvp.id);
+     localStorage.setItem('wi_rsvp_choice',attending);
+     if(window.__saveName)window.__saveName(name);
+     toast(had?'Đã cập nhật phản hồi của bạn':(attending==='yes'?'Cảm ơn! Hẹn gặp bạn tại lễ cưới ❤':'Đã ghi nhận, rất tiếc bạn không tham dự được'));
+    })
+    .catch(function(){sending=false;toast('Gửi thất bại, thử lại sau.');});
+  });
+ }
+ init();
+})();
 </script></body></html>

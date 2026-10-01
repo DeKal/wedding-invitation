@@ -730,7 +730,8 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   var DUR=9000,GAP=300,idx=0;
   (function tick(){
    if(!feed.length){looping=false;return;}
-   var SPAWN=Math.max(1800,Math.ceil((DUR+GAP)/feed.length));
+   // more items -> slower spawn; floor keeps at most ~4 pills in the 180px box
+   var SPAWN=Math.max(2200,Math.min(7000,900+260*feed.length));
    var m=feed[idx%feed.length];show(m.name,m.message,m.gift);idx++;
    setTimeout(tick,SPAWN);
   })();

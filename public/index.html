@@ -611,9 +611,21 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   var thumb=THUMB+g[0]+'.png';
   close();
   var fx=window.__giftFx;
-  if(fx){ if(fx.bump('gift')){ slide(name,g[1],thumb); var n=Math.min(6+Math.round(g[2]/900),22); fx.burst(thumb,window.innerWidth/2,n,{size:40+Math.min(g[2]/400,40)}); } }
-  else { slide(name,g[1],thumb); }
+  if(fx){ if(fx.bump('gift')){ slide(name,g[1],thumb); var n=Math.min(6+Math.round(g[2]/900),22); fx.burst(thumb,window.innerWidth/2,n,{size:40+Math.min(g[2]/400,40)}); send(name,g[0],g[1]); } }
+  else { slide(name,g[1],thumb); send(name,g[0],g[1]); }
  });
+
+ // persist gift + broadcast to other viewers; echo into blessing box locally
+ function send(name,gkey,label){
+  if(window.__blessing)window.__blessing(name,'Gửi '+label);
+  fetch('/api/gifts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,gkey:gkey,label:label})})
+   .then(function(r){return r.ok?r.json():null;})
+   .then(function(d){if(d&&d.gift&&window.__giftSeen)window.__giftSeen[d.gift.id]=1;})
+   .catch(function(){});
+ }
+
+ window.__giftSlide=slide;
+ window.__giftThumbBase=THUMB;
 
  function slide(name,gift,thumb){
   var s=document.createElement('div');s.className='gd-slide';
@@ -677,15 +689,46 @@ Anh còn, nghĩa là yêu vẫn còn.</p></div></div></div></div><div data-node-
   anim.onfinish=function(){el.remove();};
  }
  window.__blessing=show;
+ window.__giftSeen=window.__giftSeen||{};
  function api(path){return fetch(path).then(function(r){return r.ok?r.json():Promise.reject(r);});}
- api('/api/wishes?limit=50').then(function(d){
-  var ws=(d.wishes||[]).slice(0,50);
-  if(!ws.length)return;
-  var DUR=5000,GAP=300;
-  var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/ws.length));
-  var idx=0;
-  function tick(){var w=ws[idx%ws.length];show(w.name,w.message);idx++;setTimeout(tick,SPAWN);}
-  tick();
+
+ // show the gd-slide minibar for a gift from any viewer, + note in danmu feed
+ function giftPopup(g){
+  var base=window.__giftThumbBase||'assets/remote/assets.cinelove.me/gifts/thumb/';
+  if(window.__giftSlide)window.__giftSlide(g.name||'[Tên bạn]',g.label||'',base+g.gkey+'.png');
+  show(g.name,'Gửi '+(g.label||''));
+ }
+
+ Promise.all([
+  api('/api/wishes?limit=50').then(function(d){return (d.wishes||[]).slice(0,50);}).catch(function(){return[];}),
+  api('/api/gifts?limit=50').then(function(d){return (d.gifts||[]);}).catch(function(){return[];})
+ ]).then(function(res){
+  var ws=res[0],gs=res[1];
+  // seed poll cursor to newest known gift so initial load is not replayed as popups
+  var lastTs=0;gs.forEach(function(g){if(g.ts>lastTs)lastTs=g.ts;if(g.id)window.__giftSeen[g.id]=1;});
+
+  // combined danmu feed: wishes + gifts, oldest->newest
+  var feed=ws.map(function(w){return {name:w.name,message:w.message,ts:w.ts};})
+    .concat(gs.map(function(g){return {name:g.name,message:'Gửi '+(g.label||''),ts:g.ts};}));
+  feed.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  if(feed.length){
+   var DUR=5000,GAP=300;
+   var SPAWN=Math.max(700,Math.ceil((DUR+GAP)/feed.length));
+   var idx=0;
+   (function tick(){var m=feed[idx%feed.length];show(m.name,m.message);idx++;setTimeout(tick,SPAWN);})();
+  }
+
+  // poll for new gifts from other viewers and broadcast the slide popup here
+  setInterval(function(){
+   api('/api/gifts?since='+lastTs).then(function(d){
+    (d.gifts||[]).forEach(function(g){
+     if(g.ts>lastTs)lastTs=g.ts;
+     if(window.__giftSeen[g.id])return;
+     window.__giftSeen[g.id]=1;
+     giftPopup(g);
+    });
+   }).catch(function(){});
+  },4000);
  }).catch(function(){});
 })();
 </script></body></html>

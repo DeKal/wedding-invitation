@@ -112,12 +112,14 @@ export function useToolbar() {
           '<div class="bl-tit">Lời chúc</div>' +
           '<div class="bl-cont">' +
           '<div class="bl-info"><input class="bl-name" maxlength="25" type="text" placeholder="Tên của bạn"></div>' +
-          '<div class="bl-info"><textarea class="bl-mess" placeholder="Lời chúc của bạn"></textarea></div>' +
+          '<div class="bl-info"><textarea class="bl-mess" maxlength="100" placeholder="Lời chúc của bạn (tối đa 100 ký tự)"></textarea><div class="bl-count" style="font-size:12px;color:#999;text-align:right;margin-top:4px">0/100</div></div>' +
           '</div>' +
           '<button class="bl-send">Gửi Lời Chúc</button></div>';
         document.body.appendChild(ov);
         requestAnimationFrame(function () { ov.classList.add('in'); });
         var ta = ov.querySelector('.bl-mess'); var nm = ov.querySelector('.bl-name');
+        var cnt = ov.querySelector('.bl-count');
+        if (cnt) ta.addEventListener('input', function () { cnt.textContent = ta.value.length + '/100'; });
         nm.value = savedName();
         (nm.value ? ta : nm).focus();
         function close() { ov.classList.remove('in'); setTimeout(function () { ov.remove(); }, 250); }

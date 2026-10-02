@@ -1,5 +1,5 @@
-import { addRsvp, listRsvps } from '../lib/store.js';
-import { mirror } from '../lib/sheet.js';
+import { addRsvp, listRsvps } from '../../lib/store.js';
+import { mirror } from '../../lib/sheet.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

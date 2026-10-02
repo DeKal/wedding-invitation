@@ -1,20 +1,31 @@
-# Thiệp cưới 6 — Wedding Invitation (Vercel + Neon)
+# Thiệp cưới 6 — Wedding Invitation (Next.js + Neon)
 
-A self-contained clone of the "Thiệp cưới 6" wedding invitation page, deployable to
-Vercel, with a **Neon Postgres** backend so guest wishes and reactions persist.
+A self-contained clone of the "Thiệp cưới 6" wedding invitation page, built as a
+**Next.js** app with a **Neon Postgres** backend so guest wishes, reactions and
+gifts persist.
 
 ## Structure
 
 ```
-public/            Static site (index.html + localized assets, fonts, music)
-api/
-  wishes.js        GET  /api/wishes       -> list wishes
-                   POST /api/wishes        -> add a wish {name, message}
-  reactions.js     GET  /api/reactions     -> {like, heart, gift} counts
-                   POST /api/reactions     -> increment {type}
-lib/store.js       Storage layer: Neon Postgres, in-memory fallback if no DB
-vercel.json        Static + serverless config
+public/
+  invitation.html   The built invitation page (served at / via a rewrite)
+  assets/           Localized assets: fonts, images, music
+pages/api/
+  wishes.js         GET  /api/wishes      -> list wishes
+                    POST /api/wishes       -> add a wish {name, message}
+  reactions.js      GET  /api/reactions    -> {like, heart, gift} counts
+                    POST /api/reactions     -> increment {type}
+  rsvps.js          GET/POST /api/rsvps     -> list / add RSVP
+  gifts.js          GET/POST /api/gifts     -> list / add gift
+lib/store.js        Storage layer: Neon Postgres, in-memory fallback if no DB
+lib/sheet.js        Best-effort mirror of each record to a Google Sheet
+next.config.mjs     Root rewrite to invitation.html + asset cache headers
 ```
+
+The invitation page is a pre-built static document, so its inline scripts and
+styled-jsx run unchanged. `next.config.mjs` rewrites `/` to
+`public/invitation.html`; relative `assets/...` and `api/...` references resolve
+as expected.
 
 ## Backend: Neon Postgres
 
@@ -22,38 +33,36 @@ vercel.json        Static + serverless config
    (looks like `postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require`).
 2. Set it as the `DATABASE_URL` environment variable:
    - **Vercel:** Project → Settings → Environment Variables → add `DATABASE_URL`.
-   - **Local:** create `.env` with `DATABASE_URL=...` (used by `vercel dev`).
-3. Tables (`wishes`, `reactions`) are created automatically on first API call.
+   - **Local:** create `.env` with `DATABASE_URL=...` (loaded automatically by Next).
+3. Tables are created automatically on first API call.
+
+Optionally set `SHEETS_WEBHOOK_URL` to mirror records to a Google Sheet.
 
 If `DATABASE_URL` is absent the app still runs using a non-persistent in-memory
 store, so you can preview the UI without a database.
-
-## Deploy
-
-```bash
-npm install
-npx vercel          # preview
-npx vercel --prod   # production
-```
-
-Or connect the GitHub repo in the Vercel dashboard and set `DATABASE_URL`.
 
 ## Local dev
 
 ```bash
 npm install
-npx vercel dev      # serves static + /api together on http://localhost:3000
+npm run dev         # http://localhost:3000
 ```
 
-To preview just the static page without the API:
+## Build & run
 
 ```bash
-cd public && python3 -m http.server 8096
+npm run build
+npm run start
 ```
+
+## Deploy
+
+Connect the GitHub repo in the Vercel dashboard (framework preset: Next.js) and
+set `DATABASE_URL`. Vercel builds with `next build` automatically.
 
 ## Notes
 
-- The page is a static capture (the original site's React/Next.js bundle is not
-  included). Interactivity (wishes, reactions, hearts, music, scroll reveals) is
-  re-implemented with vanilla JS in `public/index.html`.
+- The page is a static capture of the original site's React/Next.js output.
+  Interactivity (wishes, reactions, hearts, music, scroll reveals, auto-scroll)
+  is driven by vanilla JS embedded in `public/invitation.html`.
 - Reaction types: `like`, `heart` (bắn tim), `gift`.

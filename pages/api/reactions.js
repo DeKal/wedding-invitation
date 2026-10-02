@@ -1,5 +1,4 @@
-import { addGift, listGifts } from '../lib/store.js';
-import { mirror } from '../lib/sheet.js';
+import { incrReaction, getReactions } from '../../lib/store.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,27 +8,18 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const limit = Math.min(Number(req.query.limit) || 50, 200);
-      const since = Number(req.query.since) || 0;
-      const gifts = await listGifts(limit, since);
-      return res.status(200).json({ gifts });
+      const counts = await getReactions();
+      return res.status(200).json(counts);
     }
 
     if (req.method === 'POST') {
       const body = await readBody(req);
-      const gkey = (body.gkey || '').toString().trim();
-      const label = (body.label || '').toString().trim();
-      const name = (body.name || '').toString().trim();
-      if (!gkey) return res.status(400).json({ error: 'gkey required' });
-      const entry = await addGift({
-        id: cryptoId(),
-        name,
-        gkey,
-        label,
-        ts: Date.now(),
-      });
-      await mirror('gift', entry);
-      return res.status(201).json({ gift: entry });
+      const type = (body.type || '').toString();
+      if (!['like', 'heart', 'gift'].includes(type)) {
+        return res.status(400).json({ error: 'invalid type' });
+      }
+      const n = await incrReaction(type);
+      return res.status(200).json({ type, count: n });
     }
 
     res.setHeader('Allow', 'GET, POST');
@@ -47,8 +37,4 @@ async function readBody(req) {
   for await (const c of req) chunks.push(c);
   const raw = Buffer.concat(chunks).toString('utf8');
   return raw ? JSON.parse(raw) : {};
-}
-
-function cryptoId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }

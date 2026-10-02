@@ -60,6 +60,9 @@ export function TextNode({
   fontSize,
   fontFamily,
   letterSpacing = 0,
+  lineHeight = 'normal',
+  fontStyle = 'normal',
+  textDecoration = 'none',
   children,
   ...node
 }) {
@@ -94,11 +97,11 @@ export function TextNode({
             fontWeight: 500,
             fontFamily: `"${fontFamily}"`,
             textAlign: align,
-            lineHeight: 'normal',
+            lineHeight,
             letterSpacing: px(letterSpacing),
             textTransform: 'none',
-            textDecoration: 'none',
-            fontStyle: 'normal',
+            textDecoration,
+            fontStyle,
             pointerEvents: 'none',
             overflow: 'hidden',
             wordBreak: 'break-word',
@@ -112,7 +115,8 @@ export function TextNode({
 }
 
 // Material image node (decor png, class family jsx-3557960200).
-export function MaterialImageNode({ src, ...node }) {
+// src is optional: an empty material-component renders when omitted.
+export function MaterialImageNode({ src = null, ...node }) {
   return (
     <PNode outerClass="jsx-3557960200" {...node}>
       <div
@@ -130,18 +134,22 @@ export function MaterialImageNode({ src, ...node }) {
           opacity: 1,
         }}
       >
-        <div className="jsx-3557960200 material-component">
-          <div
-            className="jsx-3557960200 photo-bg-wrap"
-            style={{
-              backgroundImage: asset(src),
-              border: '0px solid',
-              borderRadius: '0px',
-              padding: '0px',
-              boxShadow: 'none',
-            }}
-          />
-        </div>
+        {src ? (
+          <div className="jsx-3557960200 material-component">
+            <div
+              className="jsx-3557960200 photo-bg-wrap"
+              style={{
+                backgroundImage: asset(src),
+                border: '0px solid',
+                borderRadius: '0px',
+                padding: '0px',
+                boxShadow: 'none',
+              }}
+            />
+          </div>
+        ) : (
+          <div className="jsx-3557960200 material-component" />
+        )}
       </div>
     </PNode>
   );

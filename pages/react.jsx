@@ -2,9 +2,9 @@ import Head from 'next/head';
 import { useInvitationBehaviour } from '../components/invitation/useInvitationBehaviour';
 import { PhotoNode, TextNode, MaterialImageNode, BgShapeNode } from '../components/invitation/nodes';
 
-// In-progress React migration of the invitation (iteration 1: first ~25% of
-// nodes, top 0 -> ~1523px). The remaining nodes are still only on the static
-// page at "/". Nodes are emitted in original document order so overlapping hero
+// In-progress React migration of the invitation (iterations 1–2: first ~34 of
+// 67 nodes, top 0 -> ~3741px). The remaining nodes are still only on the static
+// page at "/". Nodes are emitted in original document order so overlapping
 // layers paint correctly. The canvas keeps its full 9138px height so positions
 // and scroll match the original exactly; migrated content occupies the top.
 export default function ReactInvitation() {
@@ -72,6 +72,44 @@ export default function ReactInvitation() {
                     <PhotoNode id="OVndXKhJtI" top={1294.87} left={190.097} width={180.688} height={407.313} anim="slide-up" delay={0.2} src="assets/images/photos/couple-05.png" radius={0} />
                     <PhotoNode id="jndvrtteX1" top={1354.8} left={386} width={30.7} height={24.9437} anim="slide-left" delay={0.2} src="assets/images/music/music-note-blue.png" radius={0} />
                     <PhotoNode id="13hHarOAcz" top={1479.51} left={425.35} width={37.2247} height={30.245} anim="slide-left" delay={0.2} src="assets/images/music/music-note-pink.png" radius={0} />
+                    {/* --- iteration 2: nodes 17–33 (top ~1523–3655px) --- */}
+                    <PhotoNode id="kpODDp1arX" top={1523} left={349} width={87.1} height={66.6504} anim="slide-left" delay={0.2} src="assets/images/decor/brush-stroke.png" radius={0} />
+                    <TextNode id="HZWmHPWqep" top={1615.67} left={148.25} width={329.2} anim="slide-up" delay={0} justify="center" align="center" color="#ff368d" fontSize={42} fontFamily="Faugllin Balseyn" letterSpacing={0} lineHeight={1.17}>
+                      As the clouds and mist dissipate,&nbsp;
+                      <span style={{ letterSpacing: '0px', backgroundColor: 'transparent' }}>I love you and everyone knows it.</span>
+                    </TextNode>
+                    <TextNode id="KIiIOP2oxg" top={1776.83} left={82} width={389.9} anim="slide-up" delay={0} justify="flex-start" align="left" color="#ffffff" fontSize={30} fontFamily="Carlytte" letterSpacing={0} lineHeight={1.15}>
+                      <p>Cảm ơn bạn đã đến nơi đây,<br />chia vui, chứng giám phút giây ngọt ngào.</p>
+                      <p>Mong mai này, lúc nhớ lại,<br />vẫn nghe hạnh phúc đong đầy trong tim.</p>
+                      <p>Lời thề còn đó, mắt cười lấp lánh,<br />niềm vui ngày ấy, mãi chẳng phai mờ.</p>
+                    </TextNode>
+                    <MaterialImageNode id="wM6lF5A_wi" top={1796.27} left={56.95} width={15.9} height={151.818} anim="slide-right" delay={0.2} />
+                    <PhotoNode id="5U4BAluoVP" top={1999.63} left={69.3532} width={360.832} height={240.811} anim="slide-up" delay={0.2} src="assets/images/photos/couple-06.jpg" radius={15} />
+                    <PhotoNode id="fHaFrmoUF9" top={2338.16} left={69.85} width={360.9} height={241.082} anim="slide-up" delay={0.2} src="assets/images/photos/couple-07.jpg" radius={15} />
+                    <PhotoNode id="YeJXmeZAm8" top={2142.42} left={30.1} width={260.9} height={138.963} anim="slide-up" delay={0.2} src="assets/images/titles/love-letter.png" radius={0} />
+                    <TextNode id="Q1DygbKk4Z" top={2310.19} left={69.85} width={361.5} anim="slide-up" delay={0} justify="center" align="center" color="#ffffff" fontSize={20} fontFamily="ShowcaseSans" letterSpacing={12}>
+                      WE ARE MARRIED
+                    </TextNode>
+                    <TextNode id="5Bc1vlS3Ft" top={2613} left={9.8} width={480} anim="slide-up" delay={0} justify="center" align="center" color="#ffc368" fontSize={26} fontFamily="Scarlet Bradley.regular" letterSpacing={0} fontStyle="italic" textDecoration="underline">
+                      Hữu Phát &amp; Mỹ Duyên
+                    </TextNode>
+                    <TextNode id="TRlwtEJNQn" top={2692.96} left={0.8} width={500} anim="slide-up" delay={0} justify="center" align="center" color="#ffffff" fontSize={32} fontFamily="Carlytte" letterSpacing={0}>
+                      Anh không phải là lựa chọn sau khi em đắn đo suy tính,&nbsp;
+                      <div>mà là người em yêu bằng cả con tim,&nbsp;</div>
+                      <div>dù biết khó khăn vẫn chẳng hề do dự.</div>
+                    </TextNode>
+                    <PhotoNode id="Ykxx6gelAO" top={2736.86} left={0.003} width={498.8} height={859.082} anim="slide-up" delay={0.2} src="assets/images/photos/couple-08.jpg" mask="assets/images/decor/060_humpjyfwnvv.png" radius={0} l3opacity={0.2} />
+                    <TextNode id="B97fZJpzM4" top={3506.09} left={10.8} width={480} anim="slide-up" delay={0} justify="center" align="center" color="#ffffff" fontSize={36} fontFamily="BethanWhite" letterSpacing={0}>
+                      Giữa hàng tỷ vì sao trong dải ngân hà,&nbsp;
+                      <div>Em chỉ muốn kề bên anh mãi mãi.</div>
+                    </TextNode>
+                    <PhotoNode id="-DyBz-kAYB" top={2933.56} left={139.752} width={360} height={499.68} anim="slide-up" delay={0.2} src="assets/images/photos/couple-09.png" radius={0} />
+                    <TextNode id="hsd7MzmaEN" top={3107.89} left={30.1} width={167} anim="slide-right" delay={0} justify="center" align="center" color="#58c5fd" fontSize={43} fontFamily="Carlytte" letterSpacing={0}>
+                      &quot;There is nothing I want more for myself than a future with you.&quot;
+                    </TextNode>
+                    <MaterialImageNode id="0__XxMtHJk" top={2848} left={266.402} width={93} height={57.0179} anim="slide-up" delay={0.2} transform="rotate(39.9551deg) scale(1, 1)" src="assets/images/decor/ixntp8lomb7yu5fpt6g8q.png" />
+                    <PhotoNode id="R8TWBhefN9" top={3655.48} left={0.8} width={370} height={493.58} anim="slide-up" delay={0.2} src="assets/images/photos/couple-10.jpg" radius={0} />
+                    <PhotoNode id="Jz-qcguaYX" top={3585.5} left={245} width={258.5} height={155.1} anim="slide-up" delay={0.2} src="assets/images/titles/step-by-step.png" radius={0} />
                   </div>
                 </div>
               </div>

@@ -16,6 +16,15 @@ export function useInvitationBehaviour() {
       e.style.opacity = '1';
       e.style.transform = 'none';
     };
+
+    // Debug: #all reveals every node immediately and skips auto-scroll, so the
+    // whole page can be inspected/screenshotted without scrolling.
+    const revealAll = typeof window !== 'undefined' && window.location.hash.indexOf('all') !== -1;
+    if (revealAll) {
+      els.forEach(reveal);
+      return;
+    }
+
     if (!('IntersectionObserver' in window)) {
       els.forEach(reveal);
     } else {

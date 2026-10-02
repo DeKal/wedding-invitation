@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import { useInvitationBehaviour } from '../components/invitation/useInvitationBehaviour';
-import { PhotoNode, TextNode, MaterialImageNode, BgShapeNode } from '../components/invitation/nodes';
+import { PhotoNode, TextNode, MaterialImageNode, BgShapeNode, CalendarNode } from '../components/invitation/nodes';
 
-// In-progress React migration of the invitation (iterations 1–2: first ~34 of
-// 67 nodes, top 0 -> ~3741px). The remaining nodes are still only on the static
+// In-progress React migration of the invitation (iterations 1–3: first ~51 of
+// 67 nodes, top 0 -> ~6714px). The remaining nodes are still only on the static
 // page at "/". Nodes are emitted in original document order so overlapping
 // layers paint correctly. The canvas keeps its full 9138px height so positions
 // and scroll match the original exactly; migrated content occupies the top.
@@ -110,6 +110,40 @@ export default function ReactInvitation() {
                     <MaterialImageNode id="0__XxMtHJk" top={2848} left={266.402} width={93} height={57.0179} anim="slide-up" delay={0.2} transform="rotate(39.9551deg) scale(1, 1)" src="assets/images/decor/ixntp8lomb7yu5fpt6g8q.png" />
                     <PhotoNode id="R8TWBhefN9" top={3655.48} left={0.8} width={370} height={493.58} anim="slide-up" delay={0.2} src="assets/images/photos/couple-10.jpg" radius={0} />
                     <PhotoNode id="Jz-qcguaYX" top={3585.5} left={245} width={258.5} height={155.1} anim="slide-up" delay={0.2} src="assets/images/titles/step-by-step.png" radius={0} />
+                    {/* --- iteration 3: nodes 35–51 (top ~4079–6714px) --- */}
+                    <TextNode id="NRXBVwFBBv" top={4079.1} left={180.95} width={274.7} anim="slide-up" delay={0} justify="flex-start" align="justify" color="#ffc368" fontSize={50} fontFamily="Katty Diona" letterSpacing={0} fontWeight="normal">
+                      I hide the roses behind me expecting to meet you at any time.
+                    </TextNode>
+                    <PhotoNode id="slipf-3TVP" top={4305.6} left={85.5251} width={200.628} height={267.3} anim="slide-up" delay={0.2} src="assets/images/photos/couple-11.jpg" radius={0} />
+                    <PhotoNode id="CVzuuIYjq6" top={4305.6} left={299.705} width={199.94} height={267.254} anim="slide-left" delay={0.2} src="assets/images/photos/couple-12.jpg" radius={0} />
+                    <PhotoNode id="8IjgW9cQ7O" top={4651.63} left={172.95} width={155.7} height={73.8018} anim="slide-up" delay={0.2} src="assets/images/titles/we-got-married.png" radius={0} />
+                    <PhotoNode id="nJ4x8p0feM" top={4800} left={41} width={418.6} height={625.388} anim="slide-up" delay={0.2} src="assets/images/photos/couple-13.jpg" radius={0} />
+                    <TextNode id="4YUXRUSBxQ" top={5481.41} left={67.75} width={365.1} anim="slide-up" delay={0} justify="center" align="center" color="#58c5fd" fontSize={48} fontFamily="Anisa Signature" letterSpacing={0}>
+                      You are back it with all the good things in this world.
+                    </TextNode>
+                    <PhotoNode id="uuA8jgYU_O" top={5623.59} left={190.964} width={275.4} height={63.8928} anim="slide-up" delay={0.2} src="assets/images/titles/information.png" radius={0} />
+                    <PhotoNode id="T6BKF2ebwz" top={5660.9} left={-0.219} width={498.9} height={746.04} anim="slide-up" delay={0.2} src="assets/images/photos/couple-14.jpg" mask="assets/images/decor/060_humpjyfwnvv.png" radius={0} l3opacity={0.2} />
+                    <PhotoNode id="J0YdHmxRo5" top={5713} left={0} width={319.8} height={426.613} anim="slide-up" delay={0.2} src="assets/images/photos/couple-15.png" radius={0} />
+                    <TextNode id="uCrncjLd65" top={6089.76} left={37.1} width={259} anim="slide-up" delay={0} justify="center" align="center" color="#ff368d" fontSize={48} fontFamily="Anisa Signature" letterSpacing={0}>
+                      I want to stay around you. Now and forever, let it be me.
+                    </TextNode>
+                    <PhotoNode id="INSs-ei8G_" top={6245.8} left={142.476} width={329.412} height={361.695} anim="slide-up" delay={0.2} src="assets/images/decor/frame.png" radius={0} />
+                    <CalendarNode id="5Z-LG1DGte" top={6319.09} left={160.7} width={295.7} height={275.987} anim="slide-up" delay={0.3} />
+                    <TextNode id="dNMncuCY-N" top={6286.47} left={162.75} width={127.5} anim="slide-up" delay={0} justify="center" align="center" color="#ffc368" fontSize={26} fontFamily="ShowcaseSans" letterSpacing={0} fontWeight="bold">
+                      07/11
+                    </TextNode>
+                    <TextNode id="cLmyc_qyDt" top={6286.44} left={303.15} width={135.3} anim="slide-left" delay={0} justify="center" align="center" color="#ffc368" fontSize={26} fontFamily="ShowcaseSans" letterSpacing={0} fontWeight="bold">
+                      -2026-
+                    </TextNode>
+                    <TextNode id="LwGeZiqk9D" top={6638.04} left={379.1} width={98.3} anim="slide-left" delay={0} justify="flex-start" align="left" color="#58c5fd" fontSize={35} fontFamily="Katty Diona" letterSpacing={0} fontWeight="bold">
+                      / Time
+                    </TextNode>
+                    <TextNode id="VSe93u7Pa_" top={6714.65} left={10.25} width={129.5} anim="slide-right" delay={0} justify="flex-end" align="right" color="#58c5fd" fontSize={35} fontFamily="Katty Diona" letterSpacing={0} fontWeight="bold">
+                      Address /
+                    </TextNode>
+                    <TextNode id="dXTOz9ghEA" top={6631.15} left={152.65} width={213.4} anim="slide-up" delay={0} justify="flex-end" align="right" color="#ffffff" fontSize={18} fontFamily="PlayfairDisplay" letterSpacing={0} lineHeight={1.6}>
+                      Thứ Bảy, 07/11/2026<div>Âm lịch 29/09 | 18:30 PM</div>
+                    </TextNode>
                   </div>
                 </div>
               </div>

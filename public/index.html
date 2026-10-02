@@ -3852,7 +3852,7 @@
                             class="jsx-1828971989">
                             <div disabled=""
                               style="height:auto;width:100%;min-width:20px;color:#ffc368;font-size:26px;text-shadow:0px 0px 2px rgba(0,0,0,0);font-weight:500;font-family:&quot;Scarlet Bradley.regular&quot;;text-align:center;line-height:normal;letter-spacing:0px;text-transform:none;text-decoration:underline;font-style:italic;pointer-events:none;overflow:hidden;word-break:break-word"
-                              contentEditable="false">Khánh Linh &amp; Nhật Nam</div>
+                              contentEditable="false">Hữu Phát &amp; Mỹ Duyên</div>
                           </div>
                         </div>
                       </div>
@@ -4836,6 +4836,27 @@
         els.forEach(function (e) { io.observe(e); });
         // fallback: when scrolled to the end, reveal anything still hidden (last nodes behind toolbar)
         if (sc) { sc.addEventListener('scroll', function () { if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4) { els.forEach(reveal); } }); }
+        // auto-scroll on first open; stops on any user input
+        (function () {
+          var useSc = !!sc;
+          var SPEED = 55; // px per second
+          var stopped = false, raf = 0, last = 0;
+          function cur() { return useSc ? sc.scrollTop : (window.scrollY || (document.scrollingElement || document.documentElement).scrollTop); }
+          function maxTop() { return useSc ? (sc.scrollHeight - sc.clientHeight) : ((document.scrollingElement || document.documentElement).scrollHeight - window.innerHeight); }
+          function setTop(v) { if (useSc) sc.scrollTop = v; else window.scrollTo(0, v); }
+          function step(ts) {
+            if (stopped) return;
+            if (!last) last = ts;
+            var dt = ts - last; last = ts;
+            setTop(cur() + SPEED * dt / 1000);
+            if (cur() >= maxTop() - 1) { stop(); return; }
+            raf = requestAnimationFrame(step);
+          }
+          var evs = ['wheel', 'touchstart', 'touchmove', 'mousedown', 'pointerdown', 'keydown'];
+          function stop() { if (stopped) return; stopped = true; if (raf) cancelAnimationFrame(raf); evs.forEach(function (n) { window.removeEventListener(n, stop, true); }); }
+          evs.forEach(function (n) { window.addEventListener(n, stop, { capture: true, passive: true }); });
+          setTimeout(function () { if (!stopped) raf = requestAnimationFrame(step); }, 900);
+        })();
       }
       if (document.readyState !== 'loading') run(); else document.addEventListener('DOMContentLoaded', run);
     })();

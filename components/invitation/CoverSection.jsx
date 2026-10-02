@@ -1,5 +1,5 @@
 // Cover: hero couple photo + WEDDING DAY (top 0–838px)
-import { BgShapeNode, PhotoNode, TextNode } from '../nodes';
+import { BgShapeNode, PhotoNode, TextNode } from './nodes';
 
 export default function CoverSection() {
   return (

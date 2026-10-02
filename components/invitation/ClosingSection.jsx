@@ -1,5 +1,5 @@
 // Closing: vinyl/welcome, couple-16/17/18, verses, Thankyou (top 7241–9022px)
-import { PhotoNode, TextNode } from '../nodes';
+import { PhotoNode, TextNode } from './nodes';
 
 export default function ClosingSection() {
   return (

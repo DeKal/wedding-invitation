@@ -1,5 +1,5 @@
 // Music card: player card, song title, couple-03 (top 614–820px)
-import { PhotoNode, TextNode } from '../nodes';
+import { PhotoNode, TextNode } from './nodes';
 
 export default function MusicCardSection() {
   return (

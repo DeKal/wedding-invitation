@@ -1,5 +1,5 @@
 // Information: couple-14/15, calendar, date/time/venue (top 5481–6718px)
-import { CalendarNode, PhotoNode, TextNode } from '../nodes';
+import { CalendarNode, PhotoNode, TextNode } from './nodes';
 
 export default function InformationSection() {
   return (

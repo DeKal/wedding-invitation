@@ -1,5 +1,5 @@
 // Love letter: brush, verses, couple-06/07, WE ARE MARRIED (top 1523–2580px)
-import { MaterialImageNode, PhotoNode, TextNode } from '../nodes';
+import { MaterialImageNode, PhotoNode, TextNode } from './nodes';
 
 export default function LoveLetterSection() {
   return (

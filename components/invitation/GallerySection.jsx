@@ -1,5 +1,5 @@
 // Gallery: couple-11/12/13 + titles (top 4079–4800px)
-import { PhotoNode, TextNode } from '../nodes';
+import { PhotoNode, TextNode } from './nodes';
 
 export default function GallerySection() {
   return (

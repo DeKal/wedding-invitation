@@ -1,5 +1,5 @@
 // Invitation: title, vinyl, welcome, couple-04/05, notes (top 853–1510px)
-import { MaterialImageNode, PhotoNode, TextNode } from '../nodes';
+import { MaterialImageNode, PhotoNode, TextNode } from './nodes';
 
 export default function InvitationSection() {
   return (

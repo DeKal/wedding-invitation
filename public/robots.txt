@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /invitation.html
+
+Sitemap: https://phat-duyen-wedding.vercel.app/sitemap.xml

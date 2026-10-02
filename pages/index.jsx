@@ -2,7 +2,8 @@ import Head from 'next/head';
 import { useInvitationBehaviour } from '../components/invitation/useInvitationBehaviour';
 import { useToolbar } from '../components/invitation/useToolbar';
 import AudioControl from '../components/invitation/AudioControl';
-import { RsvpFormNode, ToolbarChrome } from '../components/invitation/chrome';
+import { RsvpFormNode } from '../components/invitation/RsvpFormNode';
+import { ToolbarChrome } from '../components/invitation/ToolbarChrome';
 import {
   CoverSection,
   MusicCardSection,

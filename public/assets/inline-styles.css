@@ -3866,3 +3866,600 @@
       transform: translateY(0);
     }
   
+
+/* ===================== toolbar / gift / blessing / rsvp (React port) ===================== */
+/* ==== gift-drawer-css (ported from static invitation) ==== */
+#gd-ov {
+      position: fixed;
+      inset: 0;
+      z-index: 4500;
+      display: none;
+    }
+
+    #gd-ov.open {
+      display: block;
+    }
+
+    #gd-ov .gd-mask {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      opacity: 0;
+      transition: opacity .25s;
+    }
+
+    #gd-ov.open .gd-mask {
+      opacity: 1;
+    }
+
+    #gd-sheet {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 100%);
+      width: min(100vw, 480px);
+      max-height: 76vh;
+      background: #fff;
+      color: #333;
+      border-radius: .6rem .6rem 0 0;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, .25);
+      transition: transform .3s cubic-bezier(.2, .7, .3, 1);
+      display: flex;
+      flex-direction: column;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    #gd-ov.open #gd-sheet {
+      transform: translate(-50%, 0);
+    }
+
+    /* select-type header */
+    .gd-head {
+      width: 100%;
+      height: 50px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      padding-bottom: 5px;
+    }
+
+    .gd-head .gd-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #222;
+      position: relative;
+    }
+
+    .gd-head .gd-arrow {
+      width: 14px;
+      height: 14px;
+      opacity: .85;
+    }
+
+    /* gift grid (gift-ul) */
+    .gd-grid {
+      width: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      row-gap: 3px;
+      padding: 0 15px;
+      scrollbar-width: thin;
+    }
+
+    .gd-cell {
+      border-radius: 10px;
+      padding: 8px 4px 6px;
+      text-align: center;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: border-color .15s, background .15s;
+    }
+
+    .gd-cell:hover {
+      background: #faf7f8;
+    }
+
+    .gd-cell.active {
+      border-color: #ff6f91;
+      background: #fff2f5;
+    }
+
+    .gd-cell img.gd-thumb {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .gd-cell .gd-title {
+      font-size: 12px;
+      margin-top: 2px;
+      color: #333;
+      line-height: 1.2;
+      min-height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gd-cell .gd-price {
+      font-size: 12px;
+      color: #f0a020;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 1px;
+      font-weight: 600;
+    }
+
+    .gd-cell .gd-price img {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* footer (gift-give-foot) */
+    .gd-foot {
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      padding: 0 14px 10px;
+      box-shadow: rgba(0, 0, 0, .08) 0 -.3rem .8rem 0;
+      border-radius: .6rem .6rem 0 0;
+      background: #fff;
+    }
+
+    .gd-tip {
+      font-size: 12px;
+      color: #999;
+      margin-top: 8px;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    /* name + send (give-username / gift_input / cinelove-btn) */
+    .gd-row {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .gd-row input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 1px solid rgba(237, 85, 102, .4);
+      border-radius: 9px;
+      padding: 0 10px;
+      height: 50px;
+      color: #333;
+      font-size: 16px;
+      outline: none;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+
+    .gd-row input::placeholder {
+      color: #aaa;
+    }
+
+    .gd-row input:focus {
+      outline: none;
+      box-shadow: none;
+      border-color: rgba(237, 85, 102, .4);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .gd-send {
+      height: 40px;
+      padding: 0 24px;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #ff8aab, #ff5a7a);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .gd-send:active {
+      filter: brightness(.95);
+    }
+
+    /* mini slide-in notice */
+    .gd-slide {
+      position: fixed;
+      left: 12px;
+      top: 14%;
+      z-index: 5200;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, .72);
+      backdrop-filter: blur(4px);
+      border-radius: 40px;
+      padding: 6px 14px 6px 6px;
+      color: #fff;
+      font-family: sans-serif;
+      transform: translateX(-120%);
+      transition: transform .4s cubic-bezier(.2, .7, .3, 1);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .4);
+    }
+
+    .gd-slide.in {
+      transform: translateX(0);
+    }
+
+    .gd-slide img.gd-av {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .gd-slide .gd-sname {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .gd-slide .gd-sgift {
+      font-size: 12px;
+      color: #ffd36e;
+    }
+
+    .gd-slide img.gd-sthumb {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      margin-left: 4px;
+    }
+
+/* ==== blessing-css (ported from static invitation) ==== */
+.bl-ov {
+      position: fixed;
+      inset: 0;
+      z-index: 4600;
+      background: rgba(0, 0, 0, 0);
+      transition: background .25s;
+    }
+
+    .bl-ov.in {
+      background: rgba(0, 0, 0, .45);
+    }
+
+    .bl-win {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 100%);
+      transition: transform .3s cubic-bezier(.2, .7, .3, 1);
+      width: min(100vw, 480px);
+      min-height: 20rem;
+      background: #fff;
+      border-radius: .5rem .5rem 0 0;
+      box-sizing: border-box;
+      padding: 0 18px 22px;
+      text-align: center;
+      font-family: sans-serif;
+    }
+
+    .bl-ov.in .bl-win {
+      transform: translate(-50%, 0);
+    }
+
+    .bl-logo {
+      position: absolute;
+      width: 140px;
+      height: 66px;
+      top: -21px;
+      left: 50%;
+      transform: translateX(-50%);
+      object-fit: contain;
+    }
+
+    .bl-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 20px;
+      line-height: 1;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .bl-tit {
+      margin-top: 57px;
+      font-size: 21px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .bl-cont {
+      text-align: left;
+      margin-top: 16px;
+    }
+
+    .bl-info {
+      margin-bottom: 10px;
+    }
+
+    .bl-name,
+    .bl-mess {
+      width: 100%;
+      box-sizing: border-box;
+      color: #333;
+      border: 1px solid rgba(237, 85, 102, .4);
+      border-radius: 9px;
+      font-size: 16px;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+    }
+
+    .bl-name {
+      height: 50px;
+      padding: 0 10px;
+    }
+
+    .bl-mess {
+      min-height: 96px;
+      padding: 10px;
+      resize: none;
+    }
+
+    .bl-name:focus,
+    .bl-mess:focus {
+      outline: none;
+      box-shadow: none;
+      border-color: rgba(237, 85, 102, .4);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bl-send {
+      margin: 25px auto 0;
+      width: 90%;
+      height: 46px;
+      min-width: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      background: #ed5566;
+      color: #fff;
+      border: none;
+      border-radius: 40px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: .3s;
+    }
+
+    .bl-send:active {
+      filter: brightness(.95);
+    }
+
+/* ==== blessing-box-css (ported from static invitation) ==== */
+#blessing-box {
+      position: fixed;
+      left: 16px;
+      bottom: 58px;
+      width: 285px;
+      max-width: 72vw;
+      height: 180px;
+      overflow: hidden;
+      z-index: 1000;
+      pointer-events: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #blessing-box .blessing-message {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      font-size: 11px;
+      color: #fff;
+      min-height: 28px;
+      line-height: 14px;
+      border-radius: 7px;
+      padding: 2px 10px;
+      display: flex;
+      text-align: left;
+      align-items: center;
+      justify-content: center;
+      background: rgba(225, 117, 117, .5);
+      box-sizing: border-box;
+      max-width: 100%;
+      will-change: transform, opacity;
+    }
+
+    #blessing-box .blessing-text {
+      word-break: break-word;
+    }
+
+    #blessing-box .blessing-text strong {
+      font-weight: 600;
+    }
+
+    #blessing-box .bl-gift-ic {
+      width: 15px;
+      height: 15px;
+      object-fit: contain;
+      vertical-align: middle;
+      margin-left: 3px;
+      display: inline-block;
+    }
+
+/* ==== toolbar-fixed-css (ported from static invitation) ==== */
+#cinelove-toolbar {
+      position: fixed !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: 0 !important;
+      top: auto !important;
+      -webkit-transform: translateX(-50%);
+      transform: translateX(-50%);
+      width: 100% !important;
+      max-width: 500px !important;
+      z-index: 4000;
+      box-sizing: border-box;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    #cinelove-toolbar .toolbar {
+      padding-left: calc(0.5rem + env(safe-area-inset-left, 0px));
+      padding-right: calc(0.5rem + env(safe-area-inset-right, 0px));
+    }
+
+    @media (min-width:768px) {
+      #cinelove-toolbar {
+        width: 60vw !important;
+        max-width: none !important;
+      }
+    }
+
+    @media (min-width:1366px) {
+      #cinelove-toolbar {
+        width: 35vw !important;
+      }
+    }
+
+/* ==== rsvp-theme-css (ported from static invitation) ==== */
+/* Re-skin the RSVP card to the rose wedding theme (overrides inline styles). */
+    /* keep the form within the page stack, below the fixed toolbar (z 4000) */
+    .rsvp-form-container,
+    .rsvp-form-container:hover {
+      z-index: 1 !important;
+    }
+
+    /* bigger text (all sizes derive from this var) + more breathing room */
+    .rsvp-form-container {
+      --form-font-size: 16 !important;
+    }
+
+    .rsvp-form-container .rsvp-form form {
+      gap: 1.5em !important;
+    }
+
+    .rsvp-form-container .rsvp-form {
+      padding: 24px 22px !important;
+    }
+
+    .rsvp-form-container .rsvp-form {
+      background: rgba(10, 14, 22, .58) !important;
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(212, 175, 55, .5) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .45), 0 0 0 1px rgba(212, 175, 55, .1) inset, 0 0 22px rgba(212, 175, 55, .14) !important;
+      color: #e8e8ea !important;
+    }
+
+    .rsvp-form-container .rsvp-form h3 {
+      color: #ffd978 !important;
+      letter-spacing: .4px;
+      text-shadow: 0 0 12px rgba(212, 175, 55, .4);
+    }
+
+    .rsvp-form-container .rsvp-form label {
+      color: #cfd3da !important;
+    }
+
+    .rsvp-form-container input[name="rsvp-name"] {
+      border: 1px solid rgba(212, 175, 55, .55) !important;
+      border-radius: 10px !important;
+      background: rgba(255, 255, 255, .05) !important;
+      color: #f0f1f3 !important;
+      outline: none !important;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .rsvp-form-container input[name="rsvp-name"]:focus {
+      border-color: #e8c766 !important;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, .25) !important;
+    }
+
+    .rsvp-form-container input[name="rsvp-name"]::placeholder {
+      color: #8a8f99 !important;
+    }
+
+    /* radios laid out as 2 columns (side by side) instead of stacked rows */
+    .rsvp-form-container .ant-radio-group {
+      width: 100% !important;
+    }
+
+    .rsvp-form-container .ant-radio-group>div {
+      flex-direction: row !important;
+      gap: 12px !important;
+    }
+
+    .rsvp-form-container .ant-radio-wrapper {
+      flex: 1 !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      min-height: 40px;
+      color: #e8e8ea !important;
+    }
+
+    .rsvp-form-container .ant-radio-label {
+      color: #e8e8ea !important;
+      padding-inline-start: 8px !important;
+      line-height: 1.25 !important;
+      font-size: calc((var(--form-font-size) - 1) * 1px) !important;
+    }
+
+    /* per-option color: "Có" gold, "Không" stays neutral light */
+    .rsvp-form-container .ant-radio-wrapper:has(input[value="yes"]) .ant-radio-label {
+      color: #ffd978 !important;
+    }
+
+    .rsvp-form-container .ant-radio-inner {
+      border-color: rgba(212, 175, 55, .6) !important;
+      background: transparent !important;
+    }
+
+    .rsvp-form-container .ant-radio-wrapper:hover .ant-radio-inner {
+      border-color: #e8c766 !important;
+    }
+
+    .rsvp-form-container .ant-radio-checked .ant-radio-inner {
+      border-color: #d4af37 !important;
+      background: transparent !important;
+    }
+
+    .rsvp-form-container .ant-radio-checked .ant-radio-inner::after {
+      background-color: #e8c766 !important;
+    }
+
+    .rsvp-form-container button[type="submit"] {
+      background: rgba(10, 14, 22, .72) !important;
+      color: #ffd978 !important;
+      border: 1px solid rgba(212, 175, 55, .7) !important;
+      border-radius: 22px !important;
+      font-weight: 700 !important;
+      cursor: pointer;
+      letter-spacing: .3px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .4), 0 0 14px rgba(212, 175, 55, .18) !important;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .rsvp-form-container button[type="submit"]:hover {
+      transform: translateY(-1px);
+      background: rgba(20, 26, 38, .82) !important;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, .5), 0 0 18px rgba(212, 175, 55, .3) !important;
+    }
+
+    .rsvp-form-container button[type="submit"]:active {
+      transform: translateY(0);
+    }

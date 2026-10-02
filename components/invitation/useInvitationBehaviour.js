@@ -87,6 +87,19 @@ export function useInvitationBehaviour() {
       };
     })();
 
+    // --- zoom-fit: scale the fixed 500px canvas to the responsive container
+    // width (35vw >=1366, 60vw 768-1365, full width below), matching the CSS
+    // media rules that size #app-view-index / .pc-content. Without this the
+    // canvas stays 500px while the frame is 60vw, so the frame overhangs.
+    const fit = () => {
+      const el = document.getElementById('root-page-container');
+      if (!el) return;
+      const w = document.documentElement.clientWidth || window.innerWidth;
+      el.style.zoom = w >= 1366 ? (w * 0.35) / 500 : w >= 768 ? (w * 0.6) / 500 : w / 500;
+    };
+    window.addEventListener('resize', fit);
+    fit();
+
     // --- music ---
     const a = document.querySelector('audio');
     let detachMusic = () => {};
@@ -132,6 +145,7 @@ export function useInvitationBehaviour() {
     return () => {
       stopAuto();
       detachMusic();
+      window.removeEventListener('resize', fit);
     };
   }, []);
 }

@@ -125,6 +125,7 @@ export function useToolbar() {
         if (cnt) cnt.textContent = ta.value.length + '/100';
         ta.addEventListener('input', function () { if (cnt) cnt.textContent = ta.value.length + '/100'; saveWish(ta.value); });
         nm.value = savedName();
+        nm.addEventListener('input', function () { saveName(nm.value); });
         (nm.value ? ta : nm).focus();
         function close() { ov.classList.remove('in'); setTimeout(function () { ov.remove(); }, 250); }
         ov.querySelector('.bl-close').onclick = close;

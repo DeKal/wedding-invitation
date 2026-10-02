@@ -119,7 +119,11 @@ export function useToolbar() {
         requestAnimationFrame(function () { ov.classList.add('in'); });
         var ta = ov.querySelector('.bl-mess'); var nm = ov.querySelector('.bl-name');
         var cnt = ov.querySelector('.bl-count');
-        if (cnt) ta.addEventListener('input', function () { cnt.textContent = ta.value.length + '/100'; });
+        function savedWish() { try { return localStorage.getItem('wi_wish_msg') || ''; } catch (e) { return ''; } }
+        function saveWish(v) { try { localStorage.setItem('wi_wish_msg', v || ''); } catch (e) { } }
+        ta.value = savedWish();
+        if (cnt) cnt.textContent = ta.value.length + '/100';
+        ta.addEventListener('input', function () { if (cnt) cnt.textContent = ta.value.length + '/100'; saveWish(ta.value); });
         nm.value = savedName();
         (nm.value ? ta : nm).focus();
         function close() { ov.classList.remove('in'); setTimeout(function () { ov.remove(); }, 250); }
@@ -133,6 +137,7 @@ export function useToolbar() {
           saveName(nmv);
           postWish(nmv, t).then(function () {
             wishMark();
+            saveWish('');
             close(); toast('Cảm ơn lời chúc của bạn!'); burst(HAPPY, window.innerWidth / 2, 8, { size: 34 });
             if (window.__blessing) window.__blessing(nmv, t);
           }).catch(function () { toast('Gửi thất bại, thử lại sau.'); });

@@ -1,0 +1,128 @@
+// Client-side behaviour for the invitation page, ported 1:1 from the inline
+// <script> blocks of the original static export:
+//   - reveal:      IntersectionObserver that plays each node's entrance anim
+//   - autoScroll:  gentle auto-scroll on first open, cancelled by user input
+//   - music:       autoplay the soundtrack, resume on first interaction, toggle
+// Each is defensive (no-ops if its target elements are absent).
+import { useEffect } from 'react';
+
+export function useInvitationBehaviour() {
+  useEffect(() => {
+    const sc = document.querySelector('.styles_customScroll__X5r6w') || null;
+
+    // --- reveal ---
+    const els = document.querySelectorAll('[data-transition-key]');
+    const reveal = (e) => {
+      e.style.opacity = '1';
+      e.style.transform = 'none';
+    };
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(reveal);
+    } else {
+      const io = new IntersectionObserver(
+        (en) => {
+          en.forEach((e) => {
+            if (e.isIntersecting) {
+              reveal(e.target);
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { root: sc, rootMargin: '0px 0px 0px 0px', threshold: 0.01 }
+      );
+      els.forEach((e) => io.observe(e));
+      if (sc) {
+        sc.addEventListener('scroll', function onEnd() {
+          if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4) els.forEach(reveal);
+        });
+      }
+    }
+
+    // --- auto-scroll on first open; stops on any user input ---
+    const stopAuto = (() => {
+      const useSc = !!sc;
+      const SPEED = 55; // px per second
+      let stopped = false;
+      let raf = 0;
+      let last = 0;
+      const cur = () =>
+        useSc ? sc.scrollTop : window.scrollY || (document.scrollingElement || document.documentElement).scrollTop;
+      const maxTop = () =>
+        useSc
+          ? sc.scrollHeight - sc.clientHeight
+          : (document.scrollingElement || document.documentElement).scrollHeight - window.innerHeight;
+      const setTop = (v) => (useSc ? (sc.scrollTop = v) : window.scrollTo(0, v));
+      const evs = ['wheel', 'touchstart', 'touchmove', 'mousedown', 'pointerdown', 'keydown'];
+      const stop = () => {
+        if (stopped) return;
+        stopped = true;
+        if (raf) cancelAnimationFrame(raf);
+        evs.forEach((n) => window.removeEventListener(n, stop, true));
+      };
+      const step = (ts) => {
+        if (stopped) return;
+        if (!last) last = ts;
+        const dt = ts - last;
+        last = ts;
+        setTop(cur() + (SPEED * dt) / 1000);
+        if (cur() >= maxTop() - 1) return stop();
+        raf = requestAnimationFrame(step);
+      };
+      evs.forEach((n) => window.addEventListener(n, stop, { capture: true, passive: true }));
+      const timer = setTimeout(() => {
+        if (!stopped) raf = requestAnimationFrame(step);
+      }, 900);
+      return () => {
+        clearTimeout(timer);
+        stop();
+      };
+    })();
+
+    // --- music ---
+    const a = document.querySelector('audio');
+    let detachMusic = () => {};
+    if (a) {
+      a.loop = true;
+      a.volume = 1;
+      const wrap = document.getElementById('audio-control-wrapper');
+      const toggle = wrap && wrap.querySelector('.audio-toggle');
+      const spin = (on) => {
+        if (toggle) on ? toggle.classList.add('mrotate') : toggle.classList.remove('mrotate');
+        if (wrap) {
+          const c = wrap.querySelector('.icon-cancel');
+          if (c) c.style.display = on ? 'none' : 'block';
+        }
+      };
+      const play = () => a.play().then(() => spin(true)).catch(() => {});
+      const pause = () => {
+        a.pause();
+        spin(false);
+      };
+      play();
+      const once = () => {
+        if (a.paused) play();
+        window.removeEventListener('click', once);
+        window.removeEventListener('touchstart', once);
+        window.removeEventListener('scroll', once, true);
+        window.removeEventListener('keydown', once);
+      };
+      window.addEventListener('click', once);
+      window.addEventListener('touchstart', once);
+      window.addEventListener('scroll', once, true);
+      window.addEventListener('keydown', once);
+      const onToggle = (e) => {
+        e.stopPropagation();
+        a.paused ? play() : pause();
+      };
+      if (wrap) wrap.addEventListener('click', onToggle);
+      detachMusic = () => {
+        if (wrap) wrap.removeEventListener('click', onToggle);
+      };
+    }
+
+    return () => {
+      stopAuto();
+      detachMusic();
+    };
+  }, []);
+}

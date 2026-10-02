@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 // (React #418/#423). The <Head> and the visually-hidden <section> below ARE
 // server-rendered into the HTML, so metadata, link previews and crawlable text
 // all work without re-introducing hydration of the raw markup.
-const InvitationApp = dynamic(() => import('../components/invitation/InvitationApp'), {
+const InvitationApp = dynamic(() => import('../components/app/InvitationApp'), {
   ssr: false,
 });
 

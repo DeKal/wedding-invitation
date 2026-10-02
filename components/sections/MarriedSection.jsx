@@ -1,5 +1,5 @@
 // Married: names, couple-08/09/10, quotes, step-by-step (top 2613–3741px)
-import { MaterialImageNode, PhotoNode, TextNode } from './nodes';
+import { MaterialImageNode, PhotoNode, TextNode } from '../nodes';
 
 export default function MarriedSection() {
   return (

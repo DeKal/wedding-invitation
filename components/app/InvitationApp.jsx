@@ -1,8 +1,8 @@
-import { useInvitationBehaviour } from './useInvitationBehaviour';
-import { useToolbar } from './useToolbar';
-import AudioControl from './AudioControl';
-import { RsvpFormNode } from './RsvpFormNode';
-import { ToolbarChrome } from './ToolbarChrome';
+import { useInvitationBehaviour } from '../hooks/useInvitationBehaviour';
+import { useToolbar } from '../hooks/useToolbar';
+import AudioControl from '../toolbar/AudioControl';
+import { RsvpFormNode } from '../toolbar/RsvpFormNode';
+import { ToolbarChrome } from '../toolbar/ToolbarChrome';
 import {
   CoverSection,
   MusicCardSection,
@@ -12,7 +12,7 @@ import {
   GallerySection,
   InformationSection,
   ClosingSection,
-} from './sections';
+} from '../sections';
 
 // Client-only body of the invitation. Loaded via next/dynamic({ ssr: false })
 // from pages/index.jsx so it never server-renders: the page is a verbatim port

@@ -64,6 +64,7 @@ export function TextNode({
   fontStyle = 'normal',
   textDecoration = 'none',
   fontWeight = 500,
+  overflow = 'hidden',
   children,
   ...node
 }) {
@@ -104,7 +105,7 @@ export function TextNode({
             textDecoration,
             fontStyle,
             pointerEvents: 'none',
-            overflow: 'hidden',
+            overflow,
             wordBreak: 'break-word',
           }}
         >

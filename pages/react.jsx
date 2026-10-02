@@ -179,7 +179,7 @@ export default function ReactInvitation() {
                       <p>Em chẳng màng thế tục, em mãi yêu anh.<br />Ta cùng lãng mạn đi đến tận cùng.</p>
                       <p>Tình yêu không cần định nghĩa,<br />Anh còn, nghĩa là yêu vẫn còn.</p>
                     </TextNode>
-                    <TextNode id="m3FOYT8FJu" top={9022.27} left={101.85} width={296.3} anim="slide-up" delay={0} justify="center" align="center" color="#58c5fd" fontSize={72} fontFamily="Katty Diona" letterSpacing={0}>
+                    <TextNode id="m3FOYT8FJu" top={9022.27} left={101.85} width={296.3} anim="slide-up" delay={0} justify="center" align="center" color="#58c5fd" fontSize={72} fontFamily="Katty Diona" letterSpacing={0} overflow="visible">
                       Thankyou
                     </TextNode>
                     {/* RSVP form node (positioned inside the canvas) — verbatim markup */}

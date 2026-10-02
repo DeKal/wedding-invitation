@@ -12,7 +12,7 @@ const InvitationApp = dynamic(() => import('../components/app/InvitationApp'), {
 });
 
 const SITE_URL = 'https://phat-duyen-wedding.vercel.app';
-const OG_IMAGE = `${SITE_URL}/assets/images/og-cover.jpg`; // 3230x1655, full-res cover photo (uncompressed)
+const OG_IMAGE = `${SITE_URL}/assets/images/og-cover.jpg`; // 3082x1655, cropped cover photo
 const TITLE = 'Hữu Phát & Mỹ Duyên — Thiệp cưới · 07.11.2026';
 const DESCRIPTION =
   'Trân trọng kính mời bạn đến dự lễ cưới của Hữu Phát & Mỹ Duyên — Thứ Bảy, 07/11/2026, 18:30, Sảnh BallRoom, Tầng 3 Khách sạn Caravelle.';
@@ -83,7 +83,7 @@ export default function ReactInvitation() {
         <meta property="og:image" content={OG_IMAGE} />
         <meta property="og:image:secure_url" content={OG_IMAGE} />
         <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:width" content="3230" />
+        <meta property="og:image:width" content="3082" />
         <meta property="og:image:height" content="1655" />
         <meta property="og:image:alt" content="Hữu Phát & Mỹ Duyên" />
         <meta property="og:locale" content="vi_VN" />

@@ -276,6 +276,10 @@ export function useToolbar() {
       }
       // looping danmu feed (newest items join the loop too)
       var feed = []; var looping = false; var FEED_MAX = 60;
+      // Density knob: how much sooner the next bubble releases vs. full clearance.
+      // Higher = tighter/denser (bubbles sit closer); lower = more airy. The next
+      // bubble releases once the previous has risen by (its height - DENSITY).
+      var DENSITY = 22;
       function ensureLoop() {
         if (looping || !feed.length) return; looping = true;
         var idx = 0;
@@ -284,17 +288,17 @@ export function useToolbar() {
           var m = feed[idx % feed.length]; idx++;
           var el = build(m.name, m.message, m.gift);
           var h = el.getBoundingClientRect().height;
-          // Track-occupancy gate: release this bubble only once the previous one
-          // has risen far enough that this one (height h) fits below it with an 8px
-          // gap. Tightest possible spacing with no overlap, independent of length.
+          // Track-occupancy gate: release this bubble once the previous one has
+          // risen by (h - DENSITY). Spacing adapts to length; DENSITY controls how
+          // tightly they pack without stacking.
           (function wait() {
             if (!feed.length) { el.remove(); looping = false; return; }
             var ready = true;
             if (lastEl && lastEl.isConnected) {
               var boxBottom = box.getBoundingClientRect().bottom;
-              ready = lastEl.getBoundingClientRect().bottom <= boxBottom - h - 8;
+              ready = lastEl.getBoundingClientRect().bottom <= boxBottom - Math.max(6, h - DENSITY);
             }
-            if (ready) { floatIt(el); lastEl = el; setTimeout(tick, 200); }
+            if (ready) { floatIt(el); lastEl = el; setTimeout(tick, 150); }
             else requestAnimationFrame(wait);
           })();
         }

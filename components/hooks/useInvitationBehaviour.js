@@ -115,11 +115,36 @@ export function useInvitationBehaviour() {
           if (c) c.style.display = on ? 'none' : 'block';
         }
       };
-      const play = () => a.play().then(() => spin(true)).catch(() => {});
+      const play = () =>
+        a
+          .play()
+          .then(() => {
+            spin(true);
+            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+          })
+          .catch(() => {});
       const pause = () => {
         a.pause();
         spin(false);
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
       };
+      // Media session: dedicated artwork + text shown on the lock screen / media
+      // notification (independent of the app launcher icon). Without this, Android
+      // falls back to the manifest icon.
+      if ('mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
+        try {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: '07.11.2026',
+            artist: 'Phát & Duyên Wedding',
+            artwork: [
+              { src: '/assets/images/player-art-192.png', sizes: '192x192', type: 'image/png' },
+              { src: '/assets/images/player-art-512.png', sizes: '512x512', type: 'image/png' },
+            ],
+          });
+          navigator.mediaSession.setActionHandler('play', () => play());
+          navigator.mediaSession.setActionHandler('pause', () => pause());
+        } catch (_) {}
+      }
       play();
       const once = () => {
         if (a.paused) play();

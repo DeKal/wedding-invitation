@@ -265,8 +265,12 @@ export function useToolbar() {
       }
       // looping danmu feed (newest items join the loop too)
       var feed = []; var looping = false; var FEED_MAX = 60;
-      // show()'s keyframes float the bubble ~200px over 9000ms.
-      var FLOAT_PXMS = 200 / 9000;
+      // show()'s keyframes: the bubble settles near the baseline for the first
+      // ~1080ms (0→0.12 of 9000ms), THEN rises ~150px over the next ~6300ms. So the
+      // previous bubble parks at the bottom during the intro — the next spawn must
+      // wait out that intro plus the time to rise past its own height, or they touch.
+      var INTRO_MS = 1080;
+      var MOVE_PXMS = 150 / 6300;
       function ensureLoop() {
         if (looping || !feed.length) return; looping = true;
         var DUR = 9000, idx = 0;
@@ -279,8 +283,8 @@ export function useToolbar() {
           // content-aware gap: a taller (longer, wrapped) bubble needs more time to
           // clear before the next spawns, else they overlap. bubble height / float speed.
           var h = el ? el.getBoundingClientRect().height : 16;
-          var gap = Math.round((h + 12) / FLOAT_PXMS);
-          setTimeout(tick, Math.min(4000, Math.max(base, gap)));
+          var gap = INTRO_MS + Math.round((h + 12) / MOVE_PXMS);
+          setTimeout(tick, Math.min(5000, Math.max(base, gap)));
         }
         // defer the first tick so the ambient loop can't collide with the instant
         // show() that __blessing already fired (was double-floating on send).

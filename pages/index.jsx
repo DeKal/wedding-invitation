@@ -61,6 +61,13 @@ export default function ReactInvitation() {
       <Head>
         <title>{TITLE}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* LCP hero is a CSS background-image on a client-rendered (ssr:false) div,
+            so it isn't discoverable in the static HTML. Both cover photos are
+            above the fold and alternate as the LCP element; now that they're WebP
+            (18KB + 108KB) preloading them is cheap and makes the LCP image
+            discoverable + high-priority, so it paints as soon as the body mounts. */}
+        <link rel="preload" as="image" href="/assets/images/photos/couple-01.webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/assets/images/photos/couple-02.webp" fetchPriority="high" />
         <meta name="description" content={DESCRIPTION} />
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#000000" />

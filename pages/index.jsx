@@ -61,13 +61,6 @@ export default function ReactInvitation() {
       <Head>
         <title>{TITLE}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* LCP hero is a CSS background-image on a client-rendered (ssr:false)
-            div, so the browser can't discover it until the bundle mounts. Both
-            cover photos (couple-01 full-bleed bg + couple-02 on top) are above the
-            fold and alternate as the LCP element, so preload both with high
-            priority — the fetch then starts on HTML parse, parallel to the JS. */}
-        <link rel="preload" as="image" href="/assets/images/photos/couple-01.jpg" fetchPriority="high" />
-        <link rel="preload" as="image" href="/assets/images/photos/couple-02.png" fetchPriority="high" />
         <meta name="description" content={DESCRIPTION} />
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#000000" />

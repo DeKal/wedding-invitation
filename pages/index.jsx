@@ -61,6 +61,14 @@ export default function ReactInvitation() {
       <Head>
         <title>{TITLE}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* LCP hero is a CSS background-image (not an <img>), so the browser
+            discovers it late. Preload it so LCP paints sooner. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/images/photos/couple-01.jpg"
+          fetchPriority="high"
+        />
         <meta name="description" content={DESCRIPTION} />
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#000000" />

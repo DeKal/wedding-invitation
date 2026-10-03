@@ -15,8 +15,8 @@ export default function LoveLetterSection() {
         <p>Lời thề còn đó, mắt cười lấp lánh,<br />niềm vui ngày ấy, mãi chẳng phai mờ.</p>
       </TextNode>
       <MaterialImageNode id="wM6lF5A_wi" top={1796.27} left={56.95} width={15.9} height={151.818} anim="slide-right" delay={0.2} />
-      <PhotoNode id="5U4BAluoVP" top={1999.63} left={69.3532} width={360.832} height={240.811} anim="slide-up" delay={0.2} src="assets/images/photos/couple-06.jpg" radius={15} />
-      <PhotoNode id="fHaFrmoUF9" top={2338.16} left={69.85} width={360.9} height={241.082} anim="slide-up" delay={0.2} src="assets/images/photos/couple-07.jpg" radius={15} />
+      <PhotoNode id="5U4BAluoVP" top={1999.63} left={69.3532} width={360.832} height={240.811} anim="slide-up" delay={0.2} src="assets/images/photos/couple-06.webp" radius={15} />
+      <PhotoNode id="fHaFrmoUF9" top={2338.16} left={69.85} width={360.9} height={241.082} anim="slide-up" delay={0.2} src="assets/images/photos/couple-07.webp" radius={15} />
       <PhotoNode id="YeJXmeZAm8" top={2142.42} left={30.1} width={260.9} height={138.963} anim="slide-up" delay={0.2} src="assets/images/titles/love-letter.png" radius={0} />
       <TextNode id="Q1DygbKk4Z" top={2310.19} left={69.85} width={361.5} anim="slide-up" delay={0} justify="center" align="center" color="#ffffff" fontSize={20} fontFamily="ShowcaseSans" letterSpacing={12}>
         WE ARE MARRIED

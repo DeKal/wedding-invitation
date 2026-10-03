@@ -9,7 +9,7 @@ export default function InformationSection() {
       </TextNode>
       <PhotoNode id="uuA8jgYU_O" top={5623.59} left={190.964} width={275.4} height={63.8928} anim="slide-up" delay={0.2} src="assets/images/titles/information.png" radius={0} />
       <PhotoNode id="T6BKF2ebwz" top={5660.9} left={-0.219} width={498.9} height={746.04} anim="slide-up" delay={0.2} src="assets/images/photos/couple-14.jpg" mask="assets/images/decor/060_humpjyfwnvv.png" radius={0} l3opacity={0.2} />
-      <PhotoNode id="J0YdHmxRo5" top={5713} left={0} width={319.8} height={426.613} anim="slide-up" delay={0.2} src="assets/images/photos/couple-15.png" radius={0} />
+      <PhotoNode id="J0YdHmxRo5" top={5713} left={0} width={319.8} height={426.613} anim="slide-up" delay={0.2} src="assets/images/photos/couple-15.webp" radius={0} />
       <TextNode id="uCrncjLd65" top={6089.76} left={37.1} width={259} anim="slide-up" delay={0} justify="center" align="center" color="#ff368d" fontSize={48} fontFamily="Anisa Signature" letterSpacing={0}>
         I want to stay around you. Now and forever, let it be me.
       </TextNode>

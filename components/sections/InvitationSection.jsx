@@ -18,8 +18,8 @@ export default function InvitationSection() {
       </TextNode>
       <PhotoNode id="jxqt54II30" top={1332.83} left={43.1} width={337.34} height={340.713} anim="slide-up" delay={0.2} src="assets/images/music/vinyl.png" radius={0} />
       <PhotoNode id="8nt0MlKUg1" top={1309} left={22.1} width={335.986} height={194.2} anim="slide-up" delay={0.2} src="assets/images/titles/welcome.png" radius={0} />
-      <PhotoNode id="HqAAGFev-n" top={1275.81} left={42.8} width={194.326} height={407.313} anim="slide-right" delay={0.2} src="assets/images/photos/couple-04.png" radius={0} />
-      <PhotoNode id="OVndXKhJtI" top={1294.87} left={190.097} width={180.688} height={407.313} anim="slide-up" delay={0.2} src="assets/images/photos/couple-05.png" radius={0} />
+      <PhotoNode id="HqAAGFev-n" top={1275.81} left={42.8} width={194.326} height={407.313} anim="slide-right" delay={0.2} src="assets/images/photos/couple-04.webp" radius={0} />
+      <PhotoNode id="OVndXKhJtI" top={1294.87} left={190.097} width={180.688} height={407.313} anim="slide-up" delay={0.2} src="assets/images/photos/couple-05.webp" radius={0} />
       <PhotoNode id="jndvrtteX1" top={1354.8} left={386} width={30.7} height={24.9437} anim="slide-left" delay={0.2} src="assets/images/music/music-note-blue.png" radius={0} />
       <PhotoNode id="13hHarOAcz" top={1479.51} left={425.35} width={37.2247} height={30.245} anim="slide-left" delay={0.2} src="assets/images/music/music-note-pink.png" radius={0} />
     </>

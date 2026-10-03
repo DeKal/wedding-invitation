@@ -247,48 +247,58 @@ export function useToolbar() {
       window.addEventListener('resize', place);
       [250, 800, 1600].forEach(function (d) { setTimeout(place, d); });
       function esc(s) { return (s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-      function show(name, msg, gift) {
+      // Build a bubble but DON'T float it yet (opacity 0 so we can measure its
+      // real height for collision gating). Call floatIt() to release it.
+      function build(name, msg, gift) {
         var el = document.createElement('div'); el.className = 'blessing-message';
         var inner = '<strong>' + esc(name || 'Ẩn danh') + '</strong>: ';
         if (gift) { inner += 'Gửi <strong>' + esc(gift.label || '') + '</strong>' + (gift.thumb ? ' <img class="bl-gift-ic" src="' + gift.thumb + '" alt="">' : ''); }
         else { inner += esc(msg); }
         el.innerHTML = '<span class="blessing-text">' + inner + '</span>';
+        el.style.opacity = '0';
         box.appendChild(el);
+        return el;
+      }
+      function floatIt(el) {
+        el.style.opacity = '';
         var anim = el.animate([
           { transform: 'translateY(14px)', opacity: 0 },
           { transform: 'translateY(0px)', opacity: 1, offset: 0.12 },
           { transform: 'translateY(-150px)', opacity: 1, offset: 0.82 },
           { transform: 'translateY(-200px)', opacity: 0 }
         ], { duration: 9000, easing: 'linear' });
-        anim.onfinish = function () { el.remove(); };
-        return el;
+        anim.onfinish = function () { el.remove(); if (lastEl === el) lastEl = null; };
+      }
+      // the most recently released bubble, used to gate the next spawn.
+      var lastEl = null;
+      function show(name, msg, gift) {
+        var el = build(name, msg, gift); floatIt(el); lastEl = el; return el;
       }
       // looping danmu feed (newest items join the loop too)
       var feed = []; var looping = false; var FEED_MAX = 60;
-      // show()'s keyframes: the bubble settles near the baseline for the first
-      // ~1080ms (0→0.12 of 9000ms), THEN rises ~150px over the next ~6300ms. So the
-      // previous bubble parks at the bottom during the intro — the next spawn must
-      // wait out that intro plus the time to rise past its own height, or they touch.
-      var INTRO_MS = 1080;
-      var MOVE_PXMS = 150 / 6300;
       function ensureLoop() {
         if (looping || !feed.length) return; looping = true;
-        var DUR = 9000, idx = 0;
+        var idx = 0;
         function tick() {
           if (!feed.length) { looping = false; return; }
           var m = feed[idx % feed.length]; idx++;
-          var el = show(m.name, m.message, m.gift);
-          // base cadence: show each once when few, throttle when many.
-          var base = feed.length <= 6 ? Math.round(DUR / feed.length) : Math.min(2600, Math.max(1500, 1200 + 70 * feed.length));
-          // content-aware gap: a taller (longer, wrapped) bubble needs more time to
-          // clear before the next spawns, else they overlap. bubble height / float speed.
-          var h = el ? el.getBoundingClientRect().height : 16;
-          var gap = INTRO_MS + Math.round((h + 12) / MOVE_PXMS);
-          setTimeout(tick, Math.min(5000, Math.max(base, gap)));
+          var el = build(m.name, m.message, m.gift);
+          var h = el.getBoundingClientRect().height;
+          // Track-occupancy gate: release this bubble only once the previous one
+          // has risen far enough that this one (height h) fits below it with an 8px
+          // gap. Tightest possible spacing with no overlap, independent of length.
+          (function wait() {
+            if (!feed.length) { el.remove(); looping = false; return; }
+            var ready = true;
+            if (lastEl && lastEl.isConnected) {
+              var boxBottom = box.getBoundingClientRect().bottom;
+              ready = lastEl.getBoundingClientRect().bottom <= boxBottom - h - 8;
+            }
+            if (ready) { floatIt(el); lastEl = el; setTimeout(tick, 200); }
+            else requestAnimationFrame(wait);
+          })();
         }
-        // defer the first tick so the ambient loop can't collide with the instant
-        // show() that __blessing already fired (was double-floating on send).
-        setTimeout(tick, feed.length <= 6 ? Math.round(DUR / feed.length) : 1500);
+        setTimeout(tick, 300);
       }
       function addFeed(name, msg, gift) { feed.push({ name: name, message: msg, gift: gift || null }); if (feed.length > FEED_MAX) feed.shift(); ensureLoop(); }
       // public: float now AND keep it looping. gift = {label,thumb} for gift items

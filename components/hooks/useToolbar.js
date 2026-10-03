@@ -266,7 +266,7 @@ export function useToolbar() {
           { transform: 'translateY(0px)', opacity: 1, offset: 0.12 },
           { transform: 'translateY(-150px)', opacity: 1, offset: 0.82 },
           { transform: 'translateY(-200px)', opacity: 0 }
-        ], { duration: 9000, easing: 'linear' });
+        ], { duration: 6500, easing: 'linear' });
         anim.onfinish = function () { el.remove(); if (lastEl === el) lastEl = null; };
       }
       // the most recently released bubble, used to gate the next spawn.

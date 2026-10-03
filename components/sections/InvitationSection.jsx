@@ -16,7 +16,7 @@ export default function InvitationSection() {
           <div>luôn là điều đáng để tự hào và kể mãi không chán.</div>
         </div>
       </TextNode>
-      <PhotoNode id="jxqt54II30" top={1332.83} left={43.1} width={337.34} height={340.713} anim="slide-up" delay={0.2} src="assets/images/music/vinyl.png" radius={0} />
+      <PhotoNode id="jxqt54II30" top={1332.83} left={43.1} width={337.34} height={340.713} anim="slide-up" delay={0.2} src="assets/images/music/vinyl.webp" radius={0} />
       <PhotoNode id="8nt0MlKUg1" top={1309} left={22.1} width={335.986} height={194.2} anim="slide-up" delay={0.2} src="assets/images/titles/welcome.png" radius={0} />
       <PhotoNode id="HqAAGFev-n" top={1275.81} left={42.8} width={194.326} height={407.313} anim="slide-right" delay={0.2} src="assets/images/photos/couple-04.webp" radius={0} />
       <PhotoNode id="OVndXKhJtI" top={1294.87} left={190.097} width={180.688} height={407.313} anim="slide-up" delay={0.2} src="assets/images/photos/couple-05.webp" radius={0} />

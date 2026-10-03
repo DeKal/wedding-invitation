@@ -24,7 +24,7 @@ export function CalendarNode({
     cells.push(
       d === heartDay ? (
         <div key={d}>
-          <img className="heart-date" src={`/${heartSrc}`} alt="heart" width="200" height="203" />
+          <img className="heart-date" src={`/${heartSrc}`} alt="heart" width="160" height="162" />
           <div className="colorF">{d}</div>
         </div>
       ) : (

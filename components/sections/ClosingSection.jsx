@@ -7,7 +7,7 @@ export default function ClosingSection() {
       <TextNode id="n0uIEM2POR" top={7241.68} left={88.7} width={324.5} anim="slide-up" delay={0} justify="center" align="center" color="#ffc368" fontSize={29} fontFamily="Carlytte" letterSpacing={0}>
         Love triumphs over everything, Love has no age, no limit and no death.
       </TextNode>
-      <PhotoNode id="mbsMzKV_1n" top={7375.84} left={93.7732} width={305.92} height={308.979} anim="slide-up" delay={0.2} src="assets/images/music/vinyl.png" radius={0} />
+      <PhotoNode id="mbsMzKV_1n" top={7375.84} left={93.7732} width={305.92} height={308.979} anim="slide-up" delay={0.2} src="assets/images/music/vinyl.webp" radius={0} />
       <PhotoNode id="v9rP4OTgae" top={7351.53} left={71.8} width={305.4} height={176.521} anim="slide-up" delay={0.2} src="assets/images/titles/welcome.png" radius={0} />
       <PhotoNode id="vt51mAGeaF" top={7341.14} left={109.4} width={290.2} height={390.61} anim="slide-up" delay={0.2} src="assets/images/photos/couple-16.webp" radius={0} />
       <PhotoNode id="6w5mfHjX-o" top={7351.5} left={405.25} width={40.1} height={32.5812} anim="slide-left" delay={0.2} src="assets/images/music/music-note-blue.png" radius={0} />

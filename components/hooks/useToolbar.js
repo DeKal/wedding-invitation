@@ -246,6 +246,44 @@ export function useToolbar() {
       place();
       window.addEventListener('resize', place);
       [250, 800, 1600].forEach(function (d) { setTimeout(place, d); });
+
+      // --- hide/show toggle for the floating wishes (choice persisted) ---
+      // Docked next to the "Gửi lời chúc" button, styled to match the toolbar pills.
+      var blessingHidden = false;
+      try { blessingHidden = localStorage.getItem('wi_blessing_hidden') === '1'; } catch (e) {}
+      var EYE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+      var EYE_OFF = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      var tog = document.createElement('button');
+      tog.id = 'blessing-toggle'; tog.type = 'button';
+      tog.style.cssText = 'display:inline-flex;align-items:center;gap:6px;height:35px;padding:0 14px;border:none;border-radius:30px;background:rgba(0,0,0,.2);color:#fff;font-size:13px;line-height:1;cursor:pointer;white-space:nowrap;flex:none;-webkit-tap-highlight-color:transparent';
+      function renderTog() {
+        var label = blessingHidden ? 'Hiện Chat' : 'Ẩn Chat';
+        tog.innerHTML = (blessingHidden ? EYE_OFF : EYE) + '<span>' + label + '</span>';
+        tog.title = label; tog.setAttribute('aria-label', label);
+      }
+      function applyHidden() {
+        box.style.display = blessingHidden ? 'none' : '';
+        if (blessingHidden) { while (box.firstChild) box.removeChild(box.firstChild); lastEl = null; }
+        renderTog();
+      }
+      tog.addEventListener('click', function (e) {
+        e.stopPropagation();
+        blessingHidden = !blessingHidden;
+        try { localStorage.setItem('wi_blessing_hidden', blessingHidden ? '1' : '0'); } catch (e2) {}
+        applyHidden();
+        if (!blessingHidden) ensureLoop();
+      });
+      (function dock() {
+        var btn = document.querySelector('.message-box-button');
+        if (!btn || !btn.parentNode) { setTimeout(dock, 300); return; } // wait for toolbar HTML
+        var left = btn.parentNode; // .toolbar-left
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '8px';
+        if (!tog.parentNode) left.appendChild(tog);
+      })();
+      applyHidden();
+
       function esc(s) { return (s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
       // Build a bubble but DON'T float it yet (opacity 0 so we can measure its
       // real height for collision gating). Call floatIt() to release it.
@@ -272,6 +310,7 @@ export function useToolbar() {
       // the most recently released bubble, used to gate the next spawn.
       var lastEl = null;
       function show(name, msg, gift) {
+        if (blessingHidden) return null;
         var el = build(name, msg, gift); floatIt(el); lastEl = el; return el;
       }
       // looping danmu feed (newest items join the loop too)
@@ -281,10 +320,10 @@ export function useToolbar() {
       // bubble releases once the previous has risen by (its height - DENSITY).
       var DENSITY = 22;
       function ensureLoop() {
-        if (looping || !feed.length) return; looping = true;
+        if (looping || !feed.length || blessingHidden) return; looping = true;
         var idx = 0;
         function tick() {
-          if (!feed.length) { looping = false; return; }
+          if (!feed.length || blessingHidden) { looping = false; return; }
           var m = feed[idx % feed.length]; idx++;
           var el = build(m.name, m.message, m.gift);
           var h = el.getBoundingClientRect().height;
@@ -292,7 +331,7 @@ export function useToolbar() {
           // risen by (h - DENSITY). Spacing adapts to length; DENSITY controls how
           // tightly they pack without stacking.
           (function wait() {
-            if (!feed.length) { el.remove(); looping = false; return; }
+            if (!feed.length || blessingHidden) { el.remove(); looping = false; return; }
             var ready = true;
             if (lastEl && lastEl.isConnected) {
               var boxBottom = box.getBoundingClientRect().bottom;

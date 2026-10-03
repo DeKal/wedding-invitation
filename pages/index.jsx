@@ -64,6 +64,9 @@ export default function ReactInvitation() {
         <meta name="description" content={DESCRIPTION} />
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-title" content="Phat & Duyen" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="canonical" href={SITE_URL} />
 
         {/* Favicons / PWA */}

@@ -61,12 +61,14 @@ export default function ReactInvitation() {
       <Head>
         <title>{TITLE}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* LCP hero is a CSS background-image (not an <img>), so the browser
-            discovers it late. Preload it so LCP paints sooner. */}
+        {/* LCP hero is a CSS background-image on a client-rendered (ssr:false)
+            div, so the browser can't discover it until the bundle mounts. Preload
+            the actual LCP photo (couple-02) so the fetch starts on HTML parse, in
+            parallel with the JS, instead of after it. */}
         <link
           rel="preload"
           as="image"
-          href="/assets/images/photos/couple-01.jpg"
+          href="/assets/images/photos/couple-02.png"
           fetchPriority="high"
         />
         <meta name="description" content={DESCRIPTION} />

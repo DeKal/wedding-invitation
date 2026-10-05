@@ -105,6 +105,23 @@ export function useToolbar() {
       function namesLocked() { try { return !!localStorage.getItem('wi_rsvp_id'); } catch (e) { return false; } }
       function lockAllNames() { document.querySelectorAll('.bl-name,.gd-name,input[name="rsvp-name"]').forEach(lockNameEl); }
       window.__lockNameEl = lockNameEl; window.__namesLocked = namesLocked; window.__lockAllNames = lockAllNames;
+      // Shared full-screen "sending" spinner, used by wish / gift / RSVP submits.
+      var spin = (function () {
+        var el = null;
+        function ensure() {
+          if (el) return el;
+          var s = document.createElement('style');
+          s.textContent = '@keyframes wiSpin{to{transform:rotate(360deg)}}';
+          document.head.appendChild(s);
+          el = document.createElement('div');
+          el.style.cssText = 'position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)';
+          el.innerHTML = '<div style="width:46px;height:46px;border:4px solid rgba(255,255,255,.3);border-top-color:#ffc368;border-radius:50%;animation:wiSpin .8s linear infinite"></div>';
+          document.body.appendChild(el);
+          return el;
+        }
+        return { show: function () { ensure().style.display = 'flex'; }, hide: function () { if (el) el.style.display = 'none'; } };
+      })();
+      window.__spin = spin;
 
       var msg = document.querySelector('.message-box-button');
       if (msg) msg.addEventListener('click', openWish);
@@ -138,21 +155,27 @@ export function useToolbar() {
         function close() { ov.classList.remove('in'); setTimeout(function () { ov.remove(); }, 250); }
         ov.querySelector('.bl-close').onclick = close;
         ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+        var wSending = false;
         ov.querySelector('.bl-send').onclick = function () {
+          if (wSending) return;
           if (wishDone()) { toast('Bạn đã gửi lời chúc rồi'); close(); return; }
           var nmv = (nm.value || '').trim();
           if (!nmv) { nm.focus(); toast('Vui lòng nhập tên của bạn'); return; }
           var t = (ta.value || '').trim(); if (!t) { ta.focus(); toast('Hãy nhập lời chúc'); return; }
           saveName(nmv);
+          wSending = true;
+          if (window.__spin) window.__spin.show();
           postWish(nmv, t).then(function (res) {
+            wSending = false;
+            if (window.__spin) window.__spin.hide();
             wishMark();
             saveWish('');
             close(); toast('Cảm ơn lời chúc của bạn!'); burst(HAPPY, window.innerWidth / 2, 8, { size: 34 });
-            // mark our own wish seen so the 4s poll doesn't float it a second time
+            // mark our own wish seen so the 10s poll doesn't float it a second time
             var w = res && res.wish;
             if (w && w.id) { window.__wishSeen = window.__wishSeen || {}; window.__wishSeen[w.id] = 1; }
             if (window.__blessing) window.__blessing(nmv, t);
-          }).catch(function () { toast('Gửi thất bại, thử lại sau.'); });
+          }).catch(function () { wSending = false; if (window.__spin) window.__spin.hide(); toast('Gửi thất bại, thử lại sau.'); });
         };
       }
       function esc(s) { return (s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -162,7 +185,7 @@ export function useToolbar() {
         document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2200);
       }
 
-      window.__giftFx = { burst: burst, bump: bump, giftBump: giftBump, toast: toast };
+      window.__giftFx = { burst: burst, bump: bump, giftBump: giftBump, giftLeft: giftLeft, toast: toast };
       loadReactions();
     })();
 
@@ -207,23 +230,39 @@ export function useToolbar() {
       ov.querySelector('.gd-mask').addEventListener('click', close);
       window.__openGiftDrawer = function () { var inp = ov.querySelector('.gd-name'); if (inp && !inp.value && window.__savedName) inp.value = window.__savedName(); if (inp && window.__namesLocked && window.__namesLocked()) window.__lockNameEl(inp); ov.classList.add('open'); };
 
+      var gSending = false;
       ov.querySelector('.gd-send').addEventListener('click', function () {
+        if (gSending) return;
         var g = GIFTS[selected];
         var name = (ov.querySelector('.gd-name').value || '').trim();
         if (!name) { var inp = ov.querySelector('.gd-name'); inp.focus(); if (window.__giftFx && window.__giftFx.toast) window.__giftFx.toast('Vui lòng nhập tên của bạn'); return; }
-        var thumb = THUMB + g[0] + '.png';
         var fx = window.__giftFx;
-        if (fx) { if (fx.giftBump()) { if (window.__saveName) window.__saveName(name); close(); slide(name, g[1], thumb); var n = Math.min(6 + Math.round(g[2] / 900), 22); fx.burst(thumb, window.innerWidth / 2, n, { size: 40 + Math.min(g[2] / 400, 40) }); send(name, g[0], g[1]); } }
-        else { if (window.__saveName) window.__saveName(name); close(); slide(name, g[1], thumb); send(name, g[0], g[1]); }
+        // gate on quota without consuming it; it's committed only once the send succeeds
+        if (fx && fx.giftLeft && fx.giftLeft() <= 0) { fx.toast('Bạn đã tặng quà tối đa 3 lần'); return; }
+        var thumb = THUMB + g[0] + '.png';
+        if (window.__saveName) window.__saveName(name);
+        gSending = true;
+        if (window.__spin) window.__spin.show();
+        send(name, g[0], g[1]).then(function () {
+          gSending = false;
+          if (window.__spin) window.__spin.hide();
+          if (fx) fx.giftBump();
+          if (window.__blessing) window.__blessing(name, '', { label: g[1], thumb: thumb });
+          close(); slide(name, g[1], thumb);
+          if (fx) { var n = Math.min(6 + Math.round(g[2] / 900), 22); fx.burst(thumb, window.innerWidth / 2, n, { size: 40 + Math.min(g[2] / 400, 40) }); }
+        }).catch(function () {
+          gSending = false;
+          if (window.__spin) window.__spin.hide();
+          if (fx) fx.toast('Gửi thất bại, thử lại sau.');
+        });
       });
 
-      // persist gift + broadcast to other viewers; echo into blessing box locally
+      // persist gift + broadcast to other viewers; returns the POST promise so the
+      // caller can show a "sending" spinner and only animate on success.
       function send(name, gkey, label) {
-        if (window.__blessing) window.__blessing(name, '', { label: label, thumb: THUMB + gkey + '.png' });
-        fetch('/api/gifts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, gkey: gkey, label: label }) })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (d) { if (d && d.gift && window.__giftSeen) window.__giftSeen[d.gift.id] = 1; })
-          .catch(function () { });
+        return fetch('/api/gifts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, gkey: gkey, label: label }) })
+          .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+          .then(function (d) { if (d && d.gift && window.__giftSeen) window.__giftSeen[d.gift.id] = 1; return d; });
       }
 
       window.__giftSlide = slide;
@@ -493,6 +532,7 @@ export function useToolbar() {
           var attending = getChoice();
           var id = localStorage.getItem('wi_rsvp_id') || '';
           sending = true;
+          if (window.__spin) window.__spin.show();
           fetch(API, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id, name: name, attending: attending })
@@ -500,6 +540,7 @@ export function useToolbar() {
             .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
             .then(function (d) {
               sending = false;
+              if (window.__spin) window.__spin.hide();
               var had = !!id;
               if (d && d.rsvp && d.rsvp.id) localStorage.setItem('wi_rsvp_id', d.rsvp.id);
               localStorage.setItem('wi_rsvp_choice', attending);
@@ -507,7 +548,7 @@ export function useToolbar() {
               lock(); showConfirm(attending);
               toast(had ? 'Đã cập nhật phản hồi của bạn' : (attending === 'yes' ? 'Cảm ơn! Hẹn gặp bạn tại lễ cưới ❤' : 'Đã ghi nhận, rất tiếc bạn không tham dự được'));
             })
-            .catch(function () { sending = false; toast('Gửi thất bại, thử lại sau.'); });
+            .catch(function () { sending = false; if (window.__spin) window.__spin.hide(); toast('Gửi thất bại, thử lại sau.'); });
         });
       }
       init();

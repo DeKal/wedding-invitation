@@ -98,6 +98,13 @@ export function useToolbar() {
       function savedName() { try { return localStorage.getItem('wi_name') || ''; } catch (e) { return ''; } }
       function saveName(n) { try { if (n) localStorage.setItem('wi_name', n); } catch (e) { } }
       window.__savedName = savedName; window.__saveName = saveName;
+      // Name lock: once the guest confirms their RSVP (wi_rsvp_id set), the name
+      // is fixed everywhere it's editable — RSVP form + the shared wish/gift name
+      // (.bl-name / .gd-name), which all read/write the same saved name.
+      function lockNameEl(el) { if (!el) return; el.readOnly = true; el.style.opacity = '0.7'; el.style.cursor = 'not-allowed'; }
+      function namesLocked() { try { return !!localStorage.getItem('wi_rsvp_id'); } catch (e) { return false; } }
+      function lockAllNames() { document.querySelectorAll('.bl-name,.gd-name,input[name="rsvp-name"]').forEach(lockNameEl); }
+      window.__lockNameEl = lockNameEl; window.__namesLocked = namesLocked; window.__lockAllNames = lockAllNames;
 
       var msg = document.querySelector('.message-box-button');
       if (msg) msg.addEventListener('click', openWish);
@@ -125,6 +132,7 @@ export function useToolbar() {
         if (cnt) cnt.textContent = ta.value.length + '/100';
         ta.addEventListener('input', function () { if (cnt) cnt.textContent = ta.value.length + '/100'; saveWish(ta.value); });
         nm.value = savedName();
+        if (namesLocked()) lockNameEl(nm);
         nm.addEventListener('input', function () { saveName(nm.value); });
         (nm.value ? ta : nm).focus();
         function close() { ov.classList.remove('in'); setTimeout(function () { ov.remove(); }, 250); }
@@ -194,7 +202,7 @@ export function useToolbar() {
       });
       function close() { ov.classList.remove('open'); }
       ov.querySelector('.gd-mask').addEventListener('click', close);
-      window.__openGiftDrawer = function () { var inp = ov.querySelector('.gd-name'); if (inp && !inp.value && window.__savedName) inp.value = window.__savedName(); ov.classList.add('open'); };
+      window.__openGiftDrawer = function () { var inp = ov.querySelector('.gd-name'); if (inp && !inp.value && window.__savedName) inp.value = window.__savedName(); if (inp && window.__namesLocked && window.__namesLocked()) window.__lockNameEl(inp); ov.classList.add('open'); };
 
       ov.querySelector('.gd-send').addEventListener('click', function () {
         var g = GIFTS[selected];
@@ -445,6 +453,8 @@ export function useToolbar() {
 
         var btn = form.querySelector('button[type="submit"]');
         function lock() {
+          if (nm) { nm.readOnly = true; nm.style.opacity = '0.7'; nm.style.cursor = 'not-allowed'; }
+          if (window.__lockAllNames) window.__lockAllNames();
           if (!btn) return; btn.disabled = true; btn.style.display = 'none';
           var grp = form.querySelector('.ant-radio-group'); var fld = grp && grp.parentElement; if (fld) fld.style.display = 'none';
         }

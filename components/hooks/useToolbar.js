@@ -144,10 +144,13 @@ export function useToolbar() {
           if (!nmv) { nm.focus(); toast('Vui lòng nhập tên của bạn'); return; }
           var t = (ta.value || '').trim(); if (!t) { ta.focus(); toast('Hãy nhập lời chúc'); return; }
           saveName(nmv);
-          postWish(nmv, t).then(function () {
+          postWish(nmv, t).then(function (res) {
             wishMark();
             saveWish('');
             close(); toast('Cảm ơn lời chúc của bạn!'); burst(HAPPY, window.innerWidth / 2, 8, { size: 34 });
+            // mark our own wish seen so the 4s poll doesn't float it a second time
+            var w = res && res.wish;
+            if (w && w.id) { window.__wishSeen = window.__wishSeen || {}; window.__wishSeen[w.id] = 1; }
             if (window.__blessing) window.__blessing(nmv, t);
           }).catch(function () { toast('Gửi thất bại, thử lại sau.'); });
         };
@@ -355,6 +358,7 @@ export function useToolbar() {
       // public: float now AND keep it looping. gift = {label,thumb} for gift items
       window.__blessing = function (name, msg, gift) { show(name, msg, gift); addFeed(name, msg, gift); };
       window.__giftSeen = window.__giftSeen || {};
+      window.__wishSeen = window.__wishSeen || {};
       function api(path) { return fetch(path).then(function (r) { return r.ok ? r.json() : Promise.reject(r); }); }
 
       // gd-slide minibar for a gift from any viewer, + loop it in the danmu feed
@@ -366,6 +370,7 @@ export function useToolbar() {
       }
 
       var lastTs = 0;
+      var lastWishTs = 0;
       // rebuild the looping feed from the server (wishes + gifts under 1 day old)
       function refreshFeed() {
         return Promise.all([
@@ -375,8 +380,9 @@ export function useToolbar() {
           var ws = res[0], gs = res[1];
           var base = window.__giftThumbBase || 'assets/images/gifts/';
           var CUT = Date.now() - 86400000; // only show items from the last 24h
-          // advance poll cursor + mark fetched gifts seen so they are not replayed as popups
+          // advance poll cursors + mark fetched items seen so they are not replayed as popups
           gs.forEach(function (g) { if (g.ts > lastTs) lastTs = g.ts; if (g.id) window.__giftSeen[g.id] = 1; });
+          ws.forEach(function (w) { if (w.ts > lastWishTs) lastWishTs = w.ts; if (w.id) window.__wishSeen[w.id] = 1; });
           // rebuild feed in place (keeps the running loop's reference)
           var seed = ws.filter(function (w) { return (w.ts || 0) >= CUT; }).map(function (w) { return { name: w.name, message: w.message, gift: null, ts: w.ts }; })
             .concat(gs.filter(function (g) { return (g.ts || 0) >= CUT; }).map(function (g) { return { name: g.name, message: '', gift: { label: g.label || '', thumb: base + g.gkey + '.png' }, ts: g.ts }; }));
@@ -390,7 +396,7 @@ export function useToolbar() {
       refreshFeed();
       setInterval(refreshFeed, 60000); // refresh the blessing-box messages every minute
 
-      // poll for new gifts from other viewers: slide popup + join the loop
+      // poll for new gifts + wishes from other viewers: slide/float + join the loop
       setInterval(function () {
         api('/api/gifts?since=' + lastTs).then(function (d) {
           (d.gifts || []).forEach(function (g) {
@@ -400,7 +406,15 @@ export function useToolbar() {
             giftPopup(g);
           });
         }).catch(function () { });
-      }, 4000);
+        api('/api/wishes?since=' + lastWishTs).then(function (d) {
+          (d.wishes || []).sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); }).forEach(function (w) {
+            if (w.ts > lastWishTs) lastWishTs = w.ts;
+            if (!w.id || window.__wishSeen[w.id]) return;
+            window.__wishSeen[w.id] = 1;
+            if (window.__blessing) window.__blessing(w.name, w.message || '');
+          });
+        }).catch(function () { });
+      }, 10000);
     })();
 
       /* ---- toolbar-fixed (verbatim) ---- */

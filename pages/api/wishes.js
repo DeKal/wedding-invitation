@@ -10,7 +10,8 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const limit = Math.min(Number(req.query.limit) || 100, 200);
-      const wishes = await listWishes(limit);
+      const since = Number(req.query.since) || 0;
+      const wishes = await listWishes(limit, since);
       return res.status(200).json({ wishes });
     }
 

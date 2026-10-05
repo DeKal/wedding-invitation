@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         message,
         ts: Date.now(),
       });
-      await mirror('wish', entry);
+      mirror('wish', entry); // fire-and-forget (best-effort Sheet mirror)
       return res.status(201).json({ wish: entry });
     }
 

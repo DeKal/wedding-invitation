@@ -21,7 +21,8 @@ export default async function handler(req, res) {
       const id = (body.id || '').toString().trim() || cryptoId();
       if (!name) return res.status(400).json({ error: 'name required' });
       const entry = await addRsvp({ id, name, attending, ts: Date.now() });
-      await mirror('rsvp', entry);
+      // Fire-and-forget: don't block the client on the Sheet mirror (best-effort).
+      mirror('rsvp', entry);
       return res.status(201).json({ rsvp: entry });
     }
 

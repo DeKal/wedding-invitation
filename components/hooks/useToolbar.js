@@ -508,6 +508,82 @@ export function useToolbar() {
           w.addEventListener('click', function () { var r = radioOf(w); if (r) setChoice(r.value); });
         });
         if (saved === 'yes' || saved === 'no') setChoice(saved);
+
+        // --- decline -> thank-you + "Hộp Mừng Cưới" (money-gift QR) ---
+        // When the guest picks "không thể tham dự", swap the form body for a
+        // thank-you note whose "Hộp Mừng Cưới" link opens a QR popup (groom +
+        // bride). Styled to match the gold-on-dark theme.
+        var card = form.closest('.rsvp-form') || form.parentElement;
+        var cardH2 = card && card.querySelector('h2');
+        var declineEl = null;
+        var acceptEl = null;
+        function openMungCuoi() {
+          var ov = document.getElementById('mungcuoi-popup');
+          if (!ov) {
+            ov = document.createElement('div');
+            ov.id = 'mungcuoi-popup';
+            ov.style.cssText = 'position:fixed;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);padding:20px;opacity:0;transition:opacity .25s';
+            var box = document.createElement('div');
+            box.style.cssText = 'position:relative;max-width:420px;width:100%;max-height:90vh;overflow:auto;background:#141414;border:1px solid rgba(212,175,55,.5);border-radius:16px;padding:24px 18px 20px;box-shadow:0 10px 40px rgba(0,0,0,.5);text-align:center;font-family:PlayfairDisplay';
+            function col(title, qr) {
+              return '<div style="flex:1;min-width:150px">' +
+                '<h4 style="margin:0 0 10px;color:#ffc368;font-size:14px;font-weight:600;line-height:1.3;white-space:pre-line">' + title + '</h4>' +
+                '<div style="background:#fff;border-radius:10px;padding:8px;display:inline-block"><img src="' + qr + '" alt="" style="width:150px;height:150px;object-fit:contain;display:block"></div>' +
+                '<div style="margin-top:10px"><a href="' + qr + '" download target="_blank" rel="noopener" style="display:inline-block;background:#000;color:#ffc368;padding:7px 14px;border-radius:20px;font-size:12px;text-decoration:none;border:1px solid rgba(212,175,55,.5)">Tải ảnh QR</a></div>' +
+                '</div>';
+            }
+            box.innerHTML =
+              '<button type="button" class="mc-close" aria-label="Đóng" style="position:absolute;top:8px;right:12px;background:none;border:none;color:#ffc368;font-size:24px;line-height:1;cursor:pointer">×</button>' +
+              '<h3 style="margin:0 0 6px;color:#ffc368;font-size:20px;font-weight:600">Hộp mừng cưới</h3>' +
+              '<p style="margin:0 0 18px;color:#e8d9b5;font-size:13px;line-height:1.5">Cảm ơn tất cả các tình cảm mà các em, các bạn, các anh các chị đã dành cho hai vợ chồng ạ!</p>' +
+              '<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">' +
+                col('MỪNG CƯỚI ĐẾN\nCHÚ RỂ', 'assets/images/qr/groom-qr.png') +
+                col('MỪNG CƯỚI ĐẾN\nCÔ DÂU', 'assets/images/qr/bride-qr.png') +
+              '</div>';
+            ov.appendChild(box);
+            document.body.appendChild(ov);
+            var close = function () { ov.style.opacity = '0'; setTimeout(function () { ov.style.display = 'none'; }, 250); };
+            ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+            box.querySelector('.mc-close').addEventListener('click', close);
+          }
+          ov.style.display = 'flex';
+          requestAnimationFrame(function () { ov.style.opacity = '1'; });
+        }
+        function buildDecline() {
+          if (declineEl) return;
+          declineEl = document.createElement('div');
+          declineEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:"Scarlet Bradley.regular";padding:4px 2px';
+          declineEl.innerHTML =
+            '<p style="margin:0 0 12px"><strong style="font-weight:700">Xin cảm ơn</strong> tất cả các tình cảm mà các em, các bạn, các anh các chị đã dành cho<br>hai vợ chồng ạ!</p>' +
+            '<p style="margin:0">Mọi người có thể sử dụng<br><span class="mungcuoi-link" style="display:inline-block;margin:4px 0;text-decoration:underline;cursor:pointer;font-weight:600;color:#ffc368">Hộp Mừng Cưới</span><br>để chung vui ạ.</p>';
+          card.appendChild(declineEl);
+          declineEl.querySelector('.mungcuoi-link').addEventListener('click', openMungCuoi);
+        }
+        // Swap the form body for the thank-you + QR note. Called on submit (or on
+        // load for a returning decliner), NOT on radio select.
+        function showDecline() {
+          buildDecline();
+          if (cardH2) cardH2.style.display = 'none';
+          form.style.display = 'none';
+          declineEl.style.display = 'block';
+        }
+        function buildAccept() {
+          if (acceptEl) return;
+          acceptEl = document.createElement('div');
+          acceptEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:"Scarlet Bradley.regular";padding:4px 2px';
+          acceptEl.innerHTML =
+            '<p style="margin:0 0 12px"><strong style="font-weight:700">Cảm ơn</strong> bạn đã xác nhận tham dự!</p>' +
+            '<p style="margin:0">Hẹn gặp mọi người tại<br>ngày lễ tiệc cưới ❤</p>';
+          card.appendChild(acceptEl);
+        }
+        // Thank-you shown after an attending confirmation.
+        function showAccept() {
+          buildAccept();
+          if (cardH2) cardH2.style.display = 'none';
+          form.style.display = 'none';
+          acceptEl.style.display = 'block';
+        }
+
         // prefill remembered name (shared with gift + lời chúc)
         if (nm && !nm.value && window.__savedName) { var sn = window.__savedName(); if (sn) nm.value = sn; }
 
@@ -527,8 +603,13 @@ export function useToolbar() {
           }
           c.innerHTML = '✓ Đã nhận xác nhận của bạn' + (att ? ('<br>' + (att === 'yes' ? 'Rất mong được gặp bạn tại lễ cưới ❤' : 'Rất tiếc bạn không thể tham dự')) : '');
         }
-        // already confirmed in a previous visit -> keep it locked + show confirmation
-        if (localStorage.getItem('wi_rsvp_id')) { lock(); showConfirm(localStorage.getItem('wi_rsvp_choice')); }
+        // already confirmed in a previous visit -> keep it locked + show the
+        // right panel (decliners see the thank-you + Hộp Mừng Cưới note).
+        if (localStorage.getItem('wi_rsvp_id')) {
+          lock();
+          if (localStorage.getItem('wi_rsvp_choice') === 'no') showDecline();
+          else showAccept();
+        }
 
         var sending = false;
         form.addEventListener('submit', function (e) {
@@ -552,7 +633,8 @@ export function useToolbar() {
               if (d && d.rsvp && d.rsvp.id) localStorage.setItem('wi_rsvp_id', d.rsvp.id);
               localStorage.setItem('wi_rsvp_choice', attending);
               if (window.__saveName) window.__saveName(name);
-              lock(); showConfirm(attending);
+              lock();
+              if (attending === 'no') showDecline(); else showAccept();
               toast(had ? 'Đã cập nhật phản hồi của bạn' : (attending === 'yes' ? 'Cảm ơn! Hẹn gặp bạn tại lễ cưới ❤' : 'Đã ghi nhận, rất tiếc bạn không tham dự được'));
             })
             .catch(function () { sending = false; if (window.__spin) window.__spin.hide(); toast('Gửi thất bại, thử lại sau.'); });

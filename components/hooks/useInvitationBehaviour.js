@@ -103,7 +103,7 @@ export function useInvitationBehaviour() {
       el.style.transform = `scale(${z})`;
       if (wrap) {
         wrap.style.width = target + 'px';
-        wrap.style.height = 9138 * z + 'px';
+        wrap.style.height = 9578 * z + 'px';
       }
     };
     window.addEventListener('resize', fit);

@@ -1,4 +1,5 @@
 // Information: couple-14/15, calendar, date/time/venue (top 5481–6718px)
+import PNode from '../nodes/PNode';
 import { CalendarNode, PhotoNode, TextNode } from '../nodes';
 
 export default function InformationSection() {
@@ -31,8 +32,27 @@ export default function InformationSection() {
         Thứ Bảy, 07/11/2026<div>Âm lịch 29/09 | 18:30 PM</div>
       </TextNode>
       <TextNode id="6MrIeBGLUQ" top={6718} left={152.7} width={266.9} anim="slide-up" delay={0} justify="flex-start" align="left" color="#ffffff" fontSize={18} fontFamily="PlayfairDisplay" letterSpacing={0}>
-        Khách sạn Caravelle, Tầng 3,&nbsp;<div>Sảnh BallRoom</div>
+        <a
+          href="https://www.google.com/maps/search/?api=1&query=Caravelle+Saigon+Hotel+19-23+Cong+Truong+Lam+Son+Quan+1"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'inherit', textDecoration: 'underline', pointerEvents: 'auto', cursor: 'pointer' }}
+        >
+          Khách sạn Caravelle, Tầng 3,&nbsp;<div>Sảnh BallRoom</div>
+        </a>
       </TextNode>
+      {/* Embedded interactive map of the venue. Sits in the band opened up by
+          shifting the RSVP form + Closing section down (+380px). */}
+      <PNode id="venue-map" top={6820} left={37} width={426} height={360} anim="slide-up" delay={0.2}>
+        <iframe
+          title="Bản đồ Khách sạn Caravelle"
+          src="https://www.google.com/maps?q=Caravelle+Saigon+Hotel,+19-23+Cong+Truong+Lam+Son,+Quan+1&output=embed"
+          style={{ width: '100%', height: '100%', border: 0, borderRadius: 12, display: 'block', pointerEvents: 'auto', filter: 'invert(90%) hue-rotate(180deg)' }}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+      </PNode>
     </>
   );
 }

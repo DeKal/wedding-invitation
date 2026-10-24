@@ -20,7 +20,7 @@ import {
 // which the browser re-parses/normalizes differently than React's SSR tree and
 // triggered hydration mismatch (React #418/#423). It is purely client-interactive
 // (IntersectionObserver reveal, auto-scroll, audio, toolbar scripts), so SSR adds
-// nothing. The 500x9138 canvas keeps its full height so positions/scroll match.
+// nothing. The 500x9578 canvas keeps its full height so positions/scroll match.
 export default function InvitationApp() {
   useInvitationBehaviour();
   useToolbar();
@@ -38,13 +38,13 @@ export default function InvitationApp() {
                 and width stay correct while #root-page-container is visually
                 scaled with transform (uniform across browsers; CSS `zoom`
                 scaled the box but not text consistently on iOS Safari). */}
-            <div id="canvas-fit" style={{ position: 'relative', width: '500px', height: '9138px' }}>
+            <div id="canvas-fit" style={{ position: 'relative', width: '500px', height: '9578px' }}>
               <div
                 id="root-page-container"
-                style={{ backgroundColor: '#000000', backgroundImage: 'none', backgroundSize: 'cover', width: '500px', height: '9138px', position: 'relative', transformOrigin: 'top left' }}
+                style={{ backgroundColor: '#000000', backgroundImage: 'none', backgroundSize: 'cover', width: '500px', height: '9578px', position: 'relative', transformOrigin: 'top left' }}
                 className="jsx-2177353859"
               >
-                <div style={{ position: 'relative', userSelect: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', width: '500px', height: '9138px', minWidth: '50px', minHeight: '50px' }}>
+                <div style={{ position: 'relative', userSelect: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', width: '500px', height: '9578px', minWidth: '50px', minHeight: '50px' }}>
                   <div className="jsx-2177353859 w-full h-full">
                     {/* 68 positioned nodes, grouped into scenes (document order) */}
                     <CoverSection />

@@ -181,9 +181,42 @@ export function useInvitationBehaviour() {
       };
     }
 
+    // --- gallery pair: click either half to slide the two split halves
+    // together (they meet centered + seamless), click again to part them.
+    // Animates each L1 node's transform (separate from the reveal, which
+    // drives the inner L2 element), so it never fights the entrance anim.
+    const pairDetach = (() => {
+      const a = document.querySelector('[data-node-id="slipf-3TVP"]');
+      const b = document.querySelector('[data-node-id="CVzuuIYjq6"]');
+      if (!a || !b) return () => {};
+      const BASE = 'rotate(0deg) scale(1, 1)';
+      // Boxes are equal (W=200.628, H=288.67). Center the pair and overlap the
+      // right half by 1px so sub-pixel rounding under the canvas scale can't open
+      // a seam; the right half paints last, so its first column covers the join.
+      const AX = -36.153; // couple-11 left 85.5251 -> 49.372
+      const BX = -50.705; // couple-12 left 299.705 -> 249.0 (= 49.372 + 200.628 - 1)
+      [a, b].forEach((el) => {
+        el.style.transition = 'transform .6s cubic-bezier(.4,0,.2,1)';
+        el.style.cursor = 'pointer';
+      });
+      let joined = false;
+      const onClick = () => {
+        joined = !joined;
+        a.style.transform = joined ? 'translateX(' + AX + 'px) ' + BASE : BASE;
+        b.style.transform = joined ? 'translateX(' + BX + 'px) ' + BASE : BASE;
+      };
+      a.addEventListener('click', onClick);
+      b.addEventListener('click', onClick);
+      return () => {
+        a.removeEventListener('click', onClick);
+        b.removeEventListener('click', onClick);
+      };
+    })();
+
     return () => {
       stopAuto();
       detachMusic();
+      pairDetach();
       window.removeEventListener('resize', fit);
       window.removeEventListener('load', fit);
       clearTimeout(fitT1);

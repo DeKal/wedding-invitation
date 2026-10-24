@@ -17,7 +17,7 @@ export default function MarriedSection() {
         Giữa hàng tỷ vì sao trong dải ngân hà,&nbsp;
         <div>Em chỉ muốn kề bên anh mãi mãi.</div>
       </TextNode>
-      <PhotoNode id="-DyBz-kAYB" top={2933.56} left={139.752} width={360} height={499.68} anim="slide-up" delay={0.2} src="assets/images/photos/couple-09.webp?v=2" radius={0} />
+      <PhotoNode id="-DyBz-kAYB" top={2933.56} left={139.752} width={360} height={499.68} anim="slide-up" delay={0.2} src="assets/images/photos/couple-09.webp?v=3" radius={0} />
       <TextNode id="hsd7MzmaEN" top={3107.89} left={30.1} width={167} anim="slide-right" delay={0} justify="center" align="center" color="#58c5fd" fontSize={43} fontFamily="Carlytte" letterSpacing={0}>
         &quot;There is nothing I want more for myself than a future with you.&quot;
       </TextNode>

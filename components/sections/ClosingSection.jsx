@@ -21,7 +21,7 @@ export default function ClosingSection() {
         <div>Soi sáng đêm hè, mang đến thu trong</div>
       </TextNode>
       <PhotoNode id="PlYKRnBGPc" top={8107.43} left={-0.2} width={341.955} height={267.409} anim="slide-up" delay={0.2} src="assets/images/photos/couple-17.webp" radius={0} />
-      <PhotoNode id="DASGsG_14A" top={8408.17} left={138.36} width={362.5} height={283.475} anim="slide-up" delay={0.2} src="assets/images/photos/couple-18.webp" radius={0} />
+      <PhotoNode id="DASGsG_14A" top={8408.17} left={138.36} width={362.5} height={283.475} anim="slide-up" delay={0.2} src="assets/images/photos/couple-18.webp?v=2" radius={0} />
       <TextNode id="sLZZKZjGjS" top={8060.5} left={265.7} width={200.7} anim="slide-left" delay={0} justify="center" align="center" color="#ffc368" fontSize={41} fontFamily="Browny Cakes Signature" letterSpacing={0} fontWeight="bold">
         The most beautiful thing in the world is that when I like you.you also like me.
       </TextNode>

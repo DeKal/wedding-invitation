@@ -34,23 +34,29 @@ export default function InvitationApp() {
         <div id="app-view-index" className="jsx-773491098 ">
           <AudioControl />
           <div className="relative overflow-x-hidden styles_customScroll__X5r6w h-full" style={{ backgroundColor: '#fff', overflowY: 'auto', touchAction: 'auto' }}>
-            <div
-              id="root-page-container"
-              style={{ backgroundColor: '#000000', backgroundImage: 'none', backgroundSize: 'cover', width: '500px', height: '9138px', position: 'relative' }}
-              className="jsx-2177353859"
-            >
-              <div style={{ position: 'relative', userSelect: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', width: '500px', height: '9138px', minWidth: '50px', minHeight: '50px' }}>
-                <div className="jsx-2177353859 w-full h-full">
-                  {/* 68 positioned nodes, grouped into scenes (document order) */}
-                  <CoverSection />
-                  <MusicCardSection />
-                  <InvitationSection />
-                  <LoveLetterSection />
-                  <MarriedSection />
-                  <GallerySection />
-                  <InformationSection />
-                  <ClosingSection />
-                  <RsvpFormNode />
+            {/* Sized wrapper reserves the scaled footprint so the scroll length
+                and width stay correct while #root-page-container is visually
+                scaled with transform (uniform across browsers; CSS `zoom`
+                scaled the box but not text consistently on iOS Safari). */}
+            <div id="canvas-fit" style={{ position: 'relative', width: '500px', height: '9138px' }}>
+              <div
+                id="root-page-container"
+                style={{ backgroundColor: '#000000', backgroundImage: 'none', backgroundSize: 'cover', width: '500px', height: '9138px', position: 'relative', transformOrigin: 'top left' }}
+                className="jsx-2177353859"
+              >
+                <div style={{ position: 'relative', userSelect: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', width: '500px', height: '9138px', minWidth: '50px', minHeight: '50px' }}>
+                  <div className="jsx-2177353859 w-full h-full">
+                    {/* 68 positioned nodes, grouped into scenes (document order) */}
+                    <CoverSection />
+                    <MusicCardSection />
+                    <InvitationSection />
+                    <LoveLetterSection />
+                    <MarriedSection />
+                    <GallerySection />
+                    <InformationSection />
+                    <ClosingSection />
+                    <RsvpFormNode />
+                  </div>
                 </div>
               </div>
             </div>

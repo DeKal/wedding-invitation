@@ -87,18 +87,32 @@ export function useInvitationBehaviour() {
       };
     })();
 
-    // --- zoom-fit: scale the fixed 500px canvas to the responsive container
-    // width (35vw >=1366, 60vw 768-1365, full width below), matching the CSS
-    // media rules that size #app-view-index / .pc-content. Without this the
-    // canvas stays 500px while the frame is 60vw, so the frame overhangs.
+    // --- zoom-fit: scale the fixed 500px canvas to the responsive frame.
+    // Reads #app-view-index's actual width (driven by CSS: full width <768,
+    // min(60vw,520px) >=768) so the scale always matches the rendered frame —
+    // no vw/clientWidth drift, no breakpoint maths duplicated here. Uses
+    // transform:scale (not CSS `zoom`) so text scales uniformly on iOS Safari,
+    // with #canvas-fit reserving the scaled footprint for correct scroll/width.
     const fit = () => {
       const el = document.getElementById('root-page-container');
-      if (!el) return;
-      const w = document.documentElement.clientWidth || window.innerWidth;
-      el.style.zoom = w >= 1366 ? (w * 0.35) / 500 : w >= 768 ? (w * 0.6) / 500 : w / 500;
+      const wrap = document.getElementById('canvas-fit');
+      const view = document.getElementById('app-view-index');
+      if (!el || !view) return;
+      const target = view.clientWidth;
+      const z = target / 500;
+      el.style.transform = `scale(${z})`;
+      if (wrap) {
+        wrap.style.width = target + 'px';
+        wrap.style.height = 9138 * z + 'px';
+      }
     };
     window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
     fit();
+    // CSS loads non-render-blocking (no resize event), so re-run once it has
+    // likely applied and the frame width reflects the 520px cap.
+    const fitT1 = setTimeout(fit, 150);
+    const fitT2 = setTimeout(fit, 600);
 
     // --- music ---
     const a = document.querySelector('audio');
@@ -171,6 +185,9 @@ export function useInvitationBehaviour() {
       stopAuto();
       detachMusic();
       window.removeEventListener('resize', fit);
+      window.removeEventListener('load', fit);
+      clearTimeout(fitT1);
+      clearTimeout(fitT2);
     };
   }, []);
 }

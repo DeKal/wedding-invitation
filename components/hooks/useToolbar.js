@@ -303,9 +303,13 @@ export function useToolbar() {
       try { blessingHidden = localStorage.getItem('wi_blessing_hidden') === '1'; } catch (e) {}
       var EYE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
       var EYE_OFF = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      // Shared toolbar-pill style, used by both the "Gửi lời chúc" button and
+      // the Ẩn Chat toggle so they render identically (inline-flex, icon + label
+      // on one baseline, same height/padding/gap/pill background).
+      var PILL = 'display:inline-flex;width:auto;align-items:center;justify-content:center;gap:6px;height:35px;padding:0 14px;border:none;border-radius:30px;background:rgba(0,0,0,.2);color:#fff;font-size:13px;line-height:1;cursor:pointer;white-space:nowrap;flex:none;-webkit-tap-highlight-color:transparent';
       var tog = document.createElement('button');
       tog.id = 'blessing-toggle'; tog.type = 'button';
-      tog.style.cssText = 'display:inline-flex;align-items:center;gap:6px;height:35px;padding:0 14px;border:none;border-radius:30px;background:rgba(0,0,0,.2);color:#fff;font-size:13px;line-height:1;cursor:pointer;white-space:nowrap;flex:none;-webkit-tap-highlight-color:transparent';
+      tog.style.cssText = PILL;
       function renderTog() {
         var label = blessingHidden ? 'Hiện Chat' : 'Ẩn Chat';
         tog.innerHTML = (blessingHidden ? EYE_OFF : EYE) + '<span>' + label + '</span>';
@@ -326,6 +330,17 @@ export function useToolbar() {
       (function dock() {
         var btn = document.querySelector('.message-box-button');
         if (!btn || !btn.parentNode) { setTimeout(dock, 300); return; } // wait for toolbar HTML
+        // Restyle the message button with the same pill as the toggle and give
+        // it an icon + label on one baseline. Short label on phones.
+        btn.style.cssText = PILL;
+        var mLabel = document.createElement('span');
+        var setMLabel = function () {
+          mLabel.textContent = matchMedia('(max-width:767px)').matches ? 'Gửi' : 'Gửi lời chúc...';
+        };
+        setMLabel();
+        window.addEventListener('resize', setMLabel);
+        btn.innerHTML = '<img src="assets/media/message.24f9a1e2.png" alt="" style="height:22px;width:auto;flex:none">';
+        btn.appendChild(mLabel);
         var left = btn.parentNode; // .toolbar-left
         left.style.display = 'flex';
         left.style.alignItems = 'center';

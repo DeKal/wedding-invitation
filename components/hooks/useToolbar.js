@@ -520,7 +520,7 @@ export function useToolbar() {
         // thank-you note whose "Hộp Mừng Cưới" link opens a QR popup (groom +
         // bride). Styled to match the gold-on-dark theme.
         var card = form.closest('.rsvp-form') || form.parentElement;
-        var cardH2 = card && card.querySelector('h2');
+        var cardH2 = card && card.querySelector('h2,h3');
         var declineEl = null;
         var acceptEl = null;
         function openMungCuoi() {
@@ -558,7 +558,7 @@ export function useToolbar() {
         function buildDecline() {
           if (declineEl) return;
           declineEl = document.createElement('div');
-          declineEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:"Scarlet Bradley.regular";padding:4px 2px';
+          declineEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:PlayfairDisplay;padding:4px 2px';
           declineEl.innerHTML =
             '<p style="margin:0 0 12px"><strong style="font-weight:700">Xin cảm ơn</strong> tất cả các tình cảm mà các em, các bạn, các anh các chị đã dành cho<br>hai vợ chồng ạ!</p>' +
             '<p style="margin:0">Mọi người có thể sử dụng<br><span class="mungcuoi-link" style="display:inline-block;margin:4px 0;text-decoration:underline;cursor:pointer;font-weight:600;color:#ffc368">Hộp Mừng Cưới</span><br>để chung vui ạ.</p>';
@@ -576,7 +576,7 @@ export function useToolbar() {
         function buildAccept() {
           if (acceptEl) return;
           acceptEl = document.createElement('div');
-          acceptEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:"Scarlet Bradley.regular";padding:4px 2px';
+          acceptEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:PlayfairDisplay;padding:4px 2px';
           acceptEl.innerHTML =
             '<p style="margin:0 0 12px"><strong style="font-weight:700">Cảm ơn</strong> bạn đã xác nhận tham dự!</p>' +
             '<p style="margin:0">Hẹn gặp mọi người tại<br>ngày lễ tiệc cưới ❤</p>';

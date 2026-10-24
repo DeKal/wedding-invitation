@@ -13,7 +13,7 @@
 // with the rest of the layout when the canvas grows.
 const RSVP_TOP = 7299.04;
 
-const SCARLET = '"Scarlet Bradley.regular"';
+const SCARLET = 'PlayfairDisplay';
 const labelStyle = { display: 'block', marginBottom: '0.43em', fontSize: '12px' };
 const radioWrapStyle = { fontSize: '12px', fontFamily: SCARLET, whiteSpace: 'break-spaces', color: '#ffc368', cursor: 'pointer' };
 
@@ -34,9 +34,9 @@ export function RsvpFormNode() {
             className="rsvp-form"
             style={{ backgroundColor: '#e0e0e0', color: '#ffc368', boxShadow: '0px 2px 10px 0px rgba(0, 0, 0, 0.1)', borderRadius: '5px', padding: '16px', minHeight: '100%', width: '100%', fontSize: '12px', fontFamily: SCARLET, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'visible', border: '1px solid #e0e0e0' }}
           >
-            <h2 style={{ marginBottom: '1.15em', color: '#ffc368', fontWeight: 500, fontFamily: SCARLET, fontSize: '18px', textAlign: 'center' }}>
+            <h3 style={{ marginBottom: '1.15em', color: '#ffc368', fontWeight: 500, fontFamily: SCARLET, fontSize: '18px', textAlign: 'center' }}>
               Xác nhận tham dự
-            </h2>
+            </h3>
             <form style={{ display: 'flex', flexDirection: 'column', gap: '1.15em' }}>
               <div>
                 <label htmlFor="rsvp-name" style={labelStyle}>Họ và tên</label>

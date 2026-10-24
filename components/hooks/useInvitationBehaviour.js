@@ -200,16 +200,36 @@ export function useInvitationBehaviour() {
         el.style.cursor = 'pointer';
       });
       let joined = false;
-      const onClick = () => {
-        joined = !joined;
+      const apply = () => {
         a.style.transform = joined ? 'translateX(' + AX + 'px) ' + BASE : BASE;
         b.style.transform = joined ? 'translateX(' + BX + 'px) ' + BASE : BASE;
       };
+      const onClick = () => { joined = !joined; apply(); };
       a.addEventListener('click', onClick);
       b.addEventListener('click', onClick);
+
+      // Auto-unite once the first time the pair scrolls into view, then leave it
+      // to the click toggle. Delayed a touch so the entrance reveal settles first.
+      let autoDone = false;
+      let autoIO = null;
+      const autoJoin = () => {
+        if (autoDone) return;
+        autoDone = true;
+        if (autoIO) autoIO.disconnect();
+        setTimeout(() => { if (!joined) { joined = true; apply(); } }, 1500);
+      };
+      if ('IntersectionObserver' in window) {
+        autoIO = new IntersectionObserver((en) => {
+          en.forEach((e) => { if (e.isIntersecting) autoJoin(); });
+        }, { root: sc, threshold: 0.6 });
+        autoIO.observe(a);
+      } else {
+        autoJoin();
+      }
       return () => {
         a.removeEventListener('click', onClick);
         b.removeEventListener('click', onClick);
+        if (autoIO) autoIO.disconnect();
       };
     })();
 

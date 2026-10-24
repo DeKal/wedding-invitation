@@ -378,97 +378,89 @@ export function useToolbar() {
         if (blessingHidden) return null;
         var el = build(name, msg, gift); floatIt(el); lastEl = el; return el;
       }
-      // looping danmu feed (newest items join the loop too)
-      var feed = []; var looping = false; var FEED_MAX = 60;
+      // --- feed playback ---------------------------------------------------
+      // feed    = list currently being played (one full pass per cycle).
+      // pending = latest polled list, waiting to be applied. It is swapped into
+      //           `feed` ONLY at a cycle boundary, never mid-pass, so a running
+      //           pass always finishes with a coherent list. If several polls
+      //           land during one pass, only the newest survives (pending is
+      //           overwritten), so we always play the latest snapshot.
+      var feed = [];
+      var pending = null;
+      var looping = false;
       // Density knob: how much sooner the next bubble releases vs. full clearance.
-      // Higher = tighter/denser (bubbles sit closer); lower = more airy. The next
-      // bubble releases once the previous has risen by (its height - DENSITY).
+      // Higher = tighter/denser; lower = more airy. Next bubble releases once the
+      // previous has risen by (its height - DENSITY).
       var DENSITY = 22;
+      // Pause after the list clears the top before the next pass replays.
+      var GAP = 2500;
       function ensureLoop() {
-        if (looping || !feed.length || blessingHidden) return; looping = true;
-        var idx = 0;
-        function tick() {
-          if (!feed.length || blessingHidden) { looping = false; return; }
-          var m = feed[idx % feed.length]; idx++;
-          var el = build(m.name, m.message, m.gift);
-          var h = el.getBoundingClientRect().height;
-          // Track-occupancy gate: release this bubble once the previous one has
-          // risen by (h - DENSITY). Spacing adapts to length; DENSITY controls how
-          // tightly they pack without stacking.
-          (function wait() {
-            if (!feed.length || blessingHidden) { el.remove(); looping = false; return; }
-            var ready = true;
-            if (lastEl && lastEl.isConnected) {
-              var boxBottom = box.getBoundingClientRect().bottom;
-              ready = lastEl.getBoundingClientRect().bottom <= boxBottom - Math.max(6, h - DENSITY);
+        if (looping || blessingHidden) return;
+        if (pending) { feed = pending; pending = null; }
+        if (!feed.length) return;
+        looping = true;
+        function cycle() {
+          if (blessingHidden) { looping = false; return; }
+          if (pending) { feed = pending; pending = null; } // swap at boundary only
+          if (!feed.length) { looping = false; return; }
+          var snapshot = feed.slice();
+          var i = 0;
+          function tick() {
+            if (blessingHidden) { looping = false; return; }
+            if (i >= snapshot.length) {
+              // finished the list: wait for the last bubble to leave the screen,
+              // then hold GAP ms before replaying from the bottom.
+              (function waitClear() {
+                if (blessingHidden) { looping = false; return; }
+                if (lastEl && lastEl.isConnected) { requestAnimationFrame(waitClear); return; }
+                setTimeout(cycle, GAP);
+              })();
+              return;
             }
-            if (ready) { floatIt(el); lastEl = el; setTimeout(tick, 150); }
-            else requestAnimationFrame(wait);
-          })();
+            var m = snapshot[i]; i++;
+            var el = build(m.name, m.message, m.gift);
+            var h = el.getBoundingClientRect().height;
+            // Track-occupancy gate: release this bubble once the previous one has
+            // risen by (h - DENSITY). Spacing adapts to length.
+            (function wait() {
+              if (blessingHidden) { el.remove(); looping = false; return; }
+              var ready = true;
+              if (lastEl && lastEl.isConnected) {
+                var boxBottom = box.getBoundingClientRect().bottom;
+                ready = lastEl.getBoundingClientRect().bottom <= boxBottom - Math.max(6, h - DENSITY);
+              }
+              if (ready) { floatIt(el); lastEl = el; setTimeout(tick, 150); }
+              else requestAnimationFrame(wait);
+            })();
+          }
+          setTimeout(tick, 300);
         }
-        setTimeout(tick, 300);
+        cycle();
       }
-      function addFeed(name, msg, gift) { feed.push({ name: name, message: msg, gift: gift || null }); if (feed.length > FEED_MAX) feed.shift(); ensureLoop(); }
-      // public: float now AND keep it looping. gift = {label,thumb} for gift items
-      window.__blessing = function (name, msg, gift) { show(name, msg, gift); addFeed(name, msg, gift); };
-      window.__giftSeen = window.__giftSeen || {};
-      window.__wishSeen = window.__wishSeen || {};
+      // Immediate one-shot echo for the viewer's own action (wish sent / gift
+      // pressed). Floats once outside the loop; the next poll folds it into feed.
+      window.__blessing = function (name, msg, gift) { show(name, msg, gift); };
       function api(path) { return fetch(path).then(function (r) { return r.ok ? r.json() : Promise.reject(r); }); }
 
-      // gd-slide minibar for a gift from any viewer, + loop it in the danmu feed
-      function giftPopup(g) {
-        var base = window.__giftThumbBase || 'assets/images/gifts/';
-        var thumb = base + g.gkey + '.png';
-        if (window.__giftSlide) window.__giftSlide(g.name || 'Ẩn danh', g.label || '', thumb);
-        window.__blessing(g.name, '', { label: g.label || '', thumb: thumb });
-      }
-
-      var lastTs = 0;
-      var lastWishTs = 0;
-      // rebuild the looping feed from the server (wishes + gifts under 1 day old)
-      function refreshFeed() {
+      // --- poll: every 30s pull wishes + gifts from the last 24h, newest first,
+      // and stash as `pending` for the loop to pick up at its next boundary. ----
+      function poll() {
         return Promise.all([
-          api('/api/wishes?limit=20').then(function (d) { return (d.wishes || []).slice(0, 20); }).catch(function () { return []; }),
-          api('/api/gifts?limit=20').then(function (d) { return (d.gifts || []); }).catch(function () { return []; })
+          api('/api/wishes?limit=100').then(function (d) { return d.wishes || []; }).catch(function () { return []; }),
+          api('/api/gifts?limit=100').then(function (d) { return d.gifts || []; }).catch(function () { return []; })
         ]).then(function (res) {
           var ws = res[0], gs = res[1];
           var base = window.__giftThumbBase || 'assets/images/gifts/';
-          var CUT = Date.now() - 86400000; // only show items from the last 24h
-          // advance poll cursors + mark fetched items seen so they are not replayed as popups
-          gs.forEach(function (g) { if (g.ts > lastTs) lastTs = g.ts; if (g.id) window.__giftSeen[g.id] = 1; });
-          ws.forEach(function (w) { if (w.ts > lastWishTs) lastWishTs = w.ts; if (w.id) window.__wishSeen[w.id] = 1; });
-          // rebuild feed in place (keeps the running loop's reference)
-          var seed = ws.filter(function (w) { return (w.ts || 0) >= CUT; }).map(function (w) { return { name: w.name, message: w.message, gift: null, ts: w.ts }; })
+          var CUT = Date.now() - 86400000; // last 24h only
+          var list = ws.filter(function (w) { return (w.ts || 0) >= CUT; }).map(function (w) { return { name: w.name, message: w.message, gift: null, ts: w.ts }; })
             .concat(gs.filter(function (g) { return (g.ts || 0) >= CUT; }).map(function (g) { return { name: g.name, message: '', gift: { label: g.label || '', thumb: base + g.gkey + '.png' }, ts: g.ts }; }));
-          seed.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
-          feed.length = 0;
-          seed.forEach(function (m) { feed.push({ name: m.name, message: m.message, gift: m.gift }); });
-          if (feed.length > FEED_MAX) feed.splice(0, feed.length - FEED_MAX);
+          list.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }); // newest -> oldest
+          pending = list;
           ensureLoop();
         }).catch(function () { });
       }
-      refreshFeed();
-      setInterval(refreshFeed, 60000); // refresh the blessing-box messages every minute
-
-      // poll for new gifts + wishes from other viewers: slide/float + join the loop
-      setInterval(function () {
-        api('/api/gifts?since=' + lastTs).then(function (d) {
-          (d.gifts || []).forEach(function (g) {
-            if (g.ts > lastTs) lastTs = g.ts;
-            if (window.__giftSeen[g.id]) return;
-            window.__giftSeen[g.id] = 1;
-            giftPopup(g);
-          });
-        }).catch(function () { });
-        api('/api/wishes?since=' + lastWishTs).then(function (d) {
-          (d.wishes || []).sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); }).forEach(function (w) {
-            if (w.ts > lastWishTs) lastWishTs = w.ts;
-            if (!w.id || window.__wishSeen[w.id]) return;
-            window.__wishSeen[w.id] = 1;
-            if (window.__blessing) window.__blessing(w.name, w.message || '');
-          });
-        }).catch(function () { });
-      }, 10000);
+      poll();
+      setInterval(poll, 30000);
     })();
 
       /* ---- toolbar-fixed (verbatim) ---- */

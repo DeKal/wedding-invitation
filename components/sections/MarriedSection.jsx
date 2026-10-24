@@ -17,12 +17,12 @@ export default function MarriedSection() {
         Giữa hàng tỷ vì sao trong dải ngân hà,&nbsp;
         <div>Em chỉ muốn kề bên anh mãi mãi.</div>
       </TextNode>
-      <PhotoNode id="-DyBz-kAYB" top={2933.56} left={139.752} width={360} height={499.68} anim="slide-up" delay={0.2} src="assets/images/photos/couple-09.webp" radius={0} />
+      <PhotoNode id="-DyBz-kAYB" top={2933.56} left={139.752} width={360} height={499.68} anim="slide-up" delay={0.2} src="assets/images/photos/couple-09.webp?v=2" radius={0} />
       <TextNode id="hsd7MzmaEN" top={3107.89} left={30.1} width={167} anim="slide-right" delay={0} justify="center" align="center" color="#58c5fd" fontSize={43} fontFamily="Carlytte" letterSpacing={0}>
         &quot;There is nothing I want more for myself than a future with you.&quot;
       </TextNode>
       <MaterialImageNode id="0__XxMtHJk" top={2848} left={266.402} width={93} height={57.0179} anim="slide-up" delay={0.2} transform="rotate(39.9551deg) scale(1, 1)" src="assets/images/decor/ixntp8lomb7yu5fpt6g8q.png" />
-      <PhotoNode id="R8TWBhefN9" top={3655.48} left={0.8} width={370} height={493.58} anim="slide-up" delay={0.2} src="assets/images/photos/couple-10.webp" radius={0} />
+      <PhotoNode id="R8TWBhefN9" top={3655.48} left={0.8} width={370} height={493.58} anim="slide-up" delay={0.2} src="assets/images/photos/couple-10.webp?v=3" radius={0} />
       <PhotoNode id="Jz-qcguaYX" top={3585.5} left={245} width={258.5} height={155.1} anim="slide-up" delay={0.2} src="assets/images/titles/step-by-step.webp" radius={0} />
     </>
   );

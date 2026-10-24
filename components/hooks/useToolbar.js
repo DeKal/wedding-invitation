@@ -285,10 +285,12 @@ export function useToolbar() {
       function place() {
         var btn = document.querySelector('.message-box-button');
         if (!btn) return;
-        var r = btn.getBoundingClientRect();
+        // Anchor to the left edge of the toolbar-left row (first pill) rather than
+        // the Gửi button, so reordering pills (Ẩn Chat before Gửi) doesn't shift it.
+        var anchor = btn.parentNode || btn;
+        var r = anchor.getBoundingClientRect();
         if (!r.width) { return; }
-        var pl = parseFloat(getComputedStyle(btn).paddingLeft) || 0;
-        var x = r.left + pl;
+        var x = r.left;
         box.style.left = Math.round(x) + 'px';
         box.style.bottom = Math.round(window.innerHeight - r.top + 8) + 'px';
         box.style.width = Math.min(285, Math.round(window.innerWidth - x - 8)) + 'px';
@@ -306,10 +308,14 @@ export function useToolbar() {
       // Shared toolbar-pill style, used by both the "Gửi lời chúc" button and
       // the Ẩn Chat toggle so they render identically (inline-flex, icon + label
       // on one baseline, same height/padding/gap/pill background).
-      var PILL = 'display:inline-flex;width:auto;align-items:center;justify-content:center;gap:6px;height:35px;padding:0 14px;border:none;border-radius:30px;background:rgba(0,0,0,.2);color:#fff;font-size:13px;line-height:1;cursor:pointer;white-space:nowrap;flex:none;-webkit-tap-highlight-color:transparent';
+      var PILL = 'display:inline-flex;width:auto;align-items:center;justify-content:center;gap:6px;height:35px;padding:0 0 0 4px;border:none;border-radius:30px;background:rgba(0,0,0,.2);color:#fff;font-size:13px;line-height:1;cursor:pointer;white-space:nowrap;flex:none;-webkit-tap-highlight-color:transparent';
       var tog = document.createElement('button');
       tog.id = 'blessing-toggle'; tog.type = 'button';
       tog.style.cssText = PILL;
+      // Fixed width so the label swap (Ẩn Chat <-> Hiện Chat, different widths)
+      // doesn't resize the pill and shove the Gửi button sideways.
+      tog.style.width = '85px';
+      tog.style.justifyContent = 'flex-start';
       function renderTog() {
         var label = blessingHidden ? 'Hiện Chat' : 'Ẩn Chat';
         tog.innerHTML = (blessingHidden ? EYE_OFF : EYE) + '<span>' + label + '</span>';
@@ -345,7 +351,7 @@ export function useToolbar() {
         left.style.display = 'flex';
         left.style.alignItems = 'center';
         left.style.gap = '8px';
-        if (!tog.parentNode) left.appendChild(tog);
+        if (!tog.parentNode) left.insertBefore(tog, btn);
       })();
       applyHidden();
 

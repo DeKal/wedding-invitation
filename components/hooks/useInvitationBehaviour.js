@@ -119,7 +119,7 @@ export function useInvitationBehaviour() {
     let detachMusic = () => {};
     if (a) {
       a.loop = true;
-      a.volume = 1;
+      a.volume = 0.65; // 35% quieter than the source file
       const wrap = document.getElementById('audio-control-wrapper');
       const toggle = wrap && wrap.querySelector('.audio-toggle');
       const spin = (on) => {
@@ -160,6 +160,12 @@ export function useInvitationBehaviour() {
         } catch (_) {}
       }
       play();
+      // Keep the corner disc in sync with the audio itself, so any play/pause
+      // source (this disc OR the in-canvas player card) updates the spin state.
+      const onAudioPlay = () => spin(true);
+      const onAudioPause = () => spin(false);
+      a.addEventListener('play', onAudioPlay);
+      a.addEventListener('pause', onAudioPause);
       const once = () => {
         if (a.paused) play();
         window.removeEventListener('click', once);
@@ -178,6 +184,8 @@ export function useInvitationBehaviour() {
       if (wrap) wrap.addEventListener('click', onToggle);
       detachMusic = () => {
         if (wrap) wrap.removeEventListener('click', onToggle);
+        a.removeEventListener('play', onAudioPlay);
+        a.removeEventListener('pause', onAudioPause);
       };
     }
 

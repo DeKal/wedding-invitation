@@ -1,10 +1,11 @@
-// Music card: player card, song title, couple-03 (top 614–820px)
+// Music card: live player card, song title, couple-03 (top 614–820px)
 import { PhotoNode, TextNode } from '../nodes';
+import MusicPlayerCard from './MusicPlayerCard';
 
 export default function MusicCardSection() {
   return (
     <>
-      <PhotoNode id="kjuSDaAb6w" top={614.791} left={22.1325} width={455.324} height={206.598} anim="slide-up" delay={0.2} src="assets/images/music/player-card.png" radius={0} />
+      <MusicPlayerCard id="kjuSDaAb6w" top={614.791} left={22.1325} width={455.324} height={206.598} anim="slide-up" delay={0.2} />
       <TextNode id="OJ3JDy50uV" top={648.9} left={140} width={172.992} anim="slide-up" delay={0} justify="flex-start" align="left" color="#000000" fontSize={23} fontFamily="PlayfairDisplay" letterSpacing={0} whiteSpace="nowrap" overflow="visible">
         i will love you
       </TextNode>

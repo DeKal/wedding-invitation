@@ -212,6 +212,7 @@ export function useToolbar() {
           '<div class="gd-title">' + g[1] + '</div></div>';
       }).join('');
       ov.innerHTML = '<div class="gd-mask"></div><div id="gd-sheet">' +
+        '<div class="gd-close">×</div>' +
         '<div class="gd-head"><div class="gd-tab">Tặng Quà <img class="gd-arrow" src="' + ARROW + '"></div></div>' +
         '<div class="gd-grid">' + cells + '</div>' +
         '<div class="gd-foot"><div class="gd-tip">Hãy để những món quà xinh đẹp này mang niềm vui bất ngờ đến với Người nhận nha</div>' +
@@ -227,6 +228,7 @@ export function useToolbar() {
       });
       function close() { ov.classList.remove('open'); }
       ov.querySelector('.gd-mask').addEventListener('click', close);
+      ov.querySelector('.gd-close').addEventListener('click', close);
       window.__openGiftDrawer = function () { var inp = ov.querySelector('.gd-name'); if (inp && !inp.value && window.__savedName) inp.value = window.__savedName(); if (inp && window.__namesLocked && window.__namesLocked()) window.__lockNameEl(inp); ov.classList.add('open'); };
 
       var gSending = false;

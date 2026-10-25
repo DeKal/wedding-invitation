@@ -202,8 +202,7 @@ export function useToolbar() {
         ['lixi', 'Lì xì', 2345], ['milk-bottle', 'Bình sữa tình yêu', 2600], ['baby-gold', 'Em bé vàng', 2899],
         ['bouquet', 'Bó hoa', 2950], ['instax', 'Máy ảnh', 2980], ['couple-birds', 'Bồ câu uyên ương', 3636],
         ['unicorn', 'Hộp kỳ lân', 3980], ['proposal-ring', 'Nhẫn cầu hôn', 3980], ['magic-stick', 'Gậy phép thuật', 5980],
-        ['swan', 'Đôi thiên nga', 6980], ['air-balloon', 'Khinh khí cầu', 8099], ['love-airplane', 'Máy bay hạnh phúc', 9998],
-        ['magic-wheel', 'Vòng quay phép thuật', 11200], ['happy-castle', 'Lâu đài tình ái', 12400], ['supper-flower-car', 'Xe hoa', 13900]
+        ['swan', 'Đôi thiên nga', 6980], ['air-balloon', 'Khinh khí cầu', 8099]
       ];
       var selected = 0;
       var ov = document.createElement('div'); ov.id = 'gd-ov';

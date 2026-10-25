@@ -125,6 +125,7 @@ export function useToolbar() {
 
       var msg = document.querySelector('.message-box-button');
       if (msg) msg.addEventListener('click', openWish);
+      window.__openWish = openWish;
 
       function openWish() {
         if (wishDone()) { toast('Bạn đã gửi lời chúc rồi'); return; }
@@ -562,9 +563,10 @@ export function useToolbar() {
           declineEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:PlayfairDisplay;padding:4px 2px';
           declineEl.innerHTML =
             '<p style="margin:0 0 12px"><strong style="font-weight:700">Xin cảm ơn</strong> tất cả các tình cảm mà các em, các bạn, các anh các chị đã dành cho<br>hai vợ chồng ạ!</p>' +
-            '<p style="margin:0">Mọi người có thể sử dụng<br><span class="mungcuoi-link" style="display:inline-block;margin:4px 0;text-decoration:underline;cursor:pointer;font-weight:600;color:#ffc368">Hộp Mừng Cưới</span><br>để chung vui ạ.</p>';
+            '<p style="margin:0">Mọi người có thể sử dụng<br><span class="gift-link" style="display:inline-block;margin:4px 0;text-decoration:underline;cursor:pointer;font-weight:600;color:#ffc368">Hộp Quà</span> hoặc <span class="wish-link" style="display:inline-block;margin:4px 0;text-decoration:underline;cursor:pointer;font-weight:600;color:#ffc368">Gửi Lời Chúc</span><br>để chung vui ạ.</p>';
           card.appendChild(declineEl);
-          declineEl.querySelector('.mungcuoi-link').addEventListener('click', openMungCuoi);
+          declineEl.querySelector('.gift-link').addEventListener('click', function () { if (window.__openGiftDrawer) window.__openGiftDrawer(); });
+          declineEl.querySelector('.wish-link').addEventListener('click', function () { if (window.__openWish) window.__openWish(); });
         }
         // Swap the form body for the thank-you + QR note. Called on submit (or on
         // load for a returning decliner), NOT on radio select.

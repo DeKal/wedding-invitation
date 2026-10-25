@@ -581,8 +581,8 @@ export function useToolbar() {
           acceptEl = document.createElement('div');
           acceptEl.style.cssText = 'display:none;text-align:center;line-height:1.6;color:#ffffff;font-size:16px;font-family:PlayfairDisplay;padding:4px 2px';
           acceptEl.innerHTML =
-            '<p style="margin:0 0 12px"><strong style="font-weight:700">Cảm ơn</strong> bạn đã xác nhận tham dự!</p>' +
-            '<p style="margin:0">Hẹn gặp mọi người tại<br>ngày lễ tiệc cưới ❤</p>';
+            '<p style="margin:0 0 12px"><strong style="font-weight:700">Xin cảm ơn</strong> tất cả các tình cảm mà các em, các bạn, các anh các chị đã dành cho<br>hai vợ chồng ạ!</p>' +
+            '<p style="margin:0;color:#ffc368">Hẹn gặp mọi người tại<br>ngày lễ tiệc cưới ❤</p>';
           card.appendChild(acceptEl);
         }
         // Thank-you shown after an attending confirmation.

@@ -1,10 +1,81 @@
 // Information: couple-14/15, calendar, date/time/venue (top 5481–6718px)
+//
+// A left sticky note toggles between the two ceremonies — "Tiệc Cưới" (wedding
+// party, Caravelle) and "Lễ Vu Quy" (bride's family rite, Thái Mỹ). Clicking it
+// swaps the date, calendar heart day, weekday/lunar/time line, the venue address
+// link, and the embedded map. State lives here so every dependent node updates.
+import { useEffect, useState } from 'react';
 import PNode from '../nodes/PNode';
 import { CalendarNode, PhotoNode, TextNode } from '../nodes';
+import CeremonyStickyNote from './CeremonyStickyNote';
+
+// URL slug per ceremony, index-aligned with CEREMONIES. ?event=le-cuoi (default)
+// or ?event=le-vu-quy selects which one loads first.
+const EVENT_SLUG = ['le-cuoi', 'le-vu-quy'];
+
+const CEREMONIES = [
+  {
+    // Tiệc Cưới — wedding party at Caravelle
+    dd: '07/11',
+    heartDay: 7,
+    dateLine: 'Thứ Bảy, 07/11/2026',
+    lunarTime: 'Âm lịch 29/09 | 18:30 PM',
+    addrHref:
+      'https://www.google.com/maps/search/?api=1&query=Caravelle+Saigon+Hotel+19-23+Cong+Truong+Lam+Son+Quan+1',
+    addrL1: 'Khách sạn Caravelle, Tầng 3,',
+    addrL2: 'Sảnh BallRoom',
+    mapTitle: 'Bản đồ Khách sạn Caravelle',
+    mapSrc:
+      'https://www.google.com/maps?q=Caravelle+Saigon+Hotel,+19-23+Cong+Truong+Lam+Son,+Quan+1&output=embed',
+  },
+  {
+    // Lễ Vu Quy — rite at Thái Mỹ
+    dd: '06/11',
+    heartDay: 6,
+    dateLine: 'Thứ Sáu, 06/11/2026',
+    lunarTime: 'Âm lịch 28/09 | 11:00 AM',
+    addrHref: 'https://www.google.com/maps/search/?api=1&query=11.010000,106.434417',
+    addrL1: '18 Đường 656, Phước Hưng 1,',
+    addrL2: 'X.Thái Mỹ, TP HCM',
+    mapTitle: 'Bản đồ Lễ Vu Quy',
+    mapSrc: 'https://www.google.com/maps?q=11.010000,106.434417&z=17&output=embed',
+  },
+];
 
 export default function InformationSection() {
+  const [sel, setSel] = useState(0);
+  const c = CEREMONIES[sel];
+
+  // Load the ceremony named in ?event= on first mount (default le-cuoi = 0).
+  useEffect(() => {
+    try {
+      const p = (new URLSearchParams(window.location.search).get('event') || '').toLowerCase();
+      const i = EVENT_SLUG.indexOf(p);
+      if (i >= 0) setSel(i);
+    } catch (_) {}
+  }, []);
+
+  // Toggle + keep the URL's ?event= in sync so the current view is shareable.
+  const toggle = () =>
+    setSel((s) => {
+      const n = (s + 1) % CEREMONIES.length;
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.set('event', EVENT_SLUG[n]);
+        window.history.replaceState({}, '', u);
+      } catch (_) {}
+      return n;
+    });
+
   return (
     <>
+      <style>{`
+        @keyframes ceremony-swap {
+          0%   { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        .ceremony-swap { display: inline-block; animation: ceremony-swap .7s ease both; }
+      `}</style>
       <TextNode id="4YUXRUSBxQ" top={5481.41} left={67.75} width={365.1} anim="slide-up" delay={0} justify="center" align="center" color="#58c5fd" fontSize={48} fontFamily="Anisa Signature" letterSpacing={0}>
         You are back it with all the good things in this world.
       </TextNode>
@@ -14,10 +85,11 @@ export default function InformationSection() {
       <TextNode id="uCrncjLd65" top={6089.76} left={37.1} width={259} anim="slide-up" delay={0} justify="center" align="center" color="#ff368d" fontSize={48} fontFamily="Anisa Signature" letterSpacing={0}>
         I want to stay around you. Now and forever, let it be me.
       </TextNode>
+      <CeremonyStickyNote id="ceremony-sticky" top={6255} left={12} width={70} anim="slide-right" delay={0.25} sel={sel} onToggle={toggle} />
       <PhotoNode id="INSs-ei8G_" top={6245.8} left={142.476} width={329.412} height={361.695} anim="slide-up" delay={0.2} src="assets/images/decor/frame.png" radius={0} />
-      <CalendarNode id="5Z-LG1DGte" top={6319.09} left={160.7} width={295.7} height={275.987} anim="slide-up" delay={0.3} />
+      <CalendarNode id="5Z-LG1DGte" top={6319.09} left={160.7} width={295.7} height={275.987} anim="slide-up" delay={0.3} heartDay={c.heartDay} />
       <TextNode id="dNMncuCY-N" top={6286.47} left={162.75} width={127.5} anim="slide-up" delay={0} justify="center" align="center" color="#ffc368" fontSize={26} fontFamily="ShowcaseSans" letterSpacing={0} fontWeight="bold">
-        07/11
+        <span key={sel} className="ceremony-swap">{c.dd}</span>
       </TextNode>
       <TextNode id="cLmyc_qyDt" top={6286.44} left={303.15} width={135.3} anim="slide-left" delay={0} justify="center" align="center" color="#ffc368" fontSize={26} fontFamily="ShowcaseSans" letterSpacing={0} fontWeight="bold">
         -2026-
@@ -28,30 +100,37 @@ export default function InformationSection() {
       <TextNode id="VSe93u7Pa_" top={6714.65} left={10.25} width={129.5} anim="slide-right" delay={0} justify="flex-end" align="right" color="#58c5fd" fontSize={35} fontFamily="Katty Diona" letterSpacing={0} fontWeight="bold">
         Address /
       </TextNode>
-      <TextNode id="dXTOz9ghEA" top={6631.15} left={152.65} width={213.4} anim="slide-up" delay={0} justify="flex-end" align="right" color="#ffffff" fontSize={18} fontFamily="PlayfairDisplay" letterSpacing={0} lineHeight={1.6}>
-        Thứ Bảy, 07/11/2026<div>Âm lịch 29/09 | 18:30 PM</div>
+      <TextNode id="dXTOz9ghEA" top={6631.15} left={152.65} width={213.4} anim="slide-up" delay={0} justify="flex-end" align="right" color="#ffffff" fontSize={18} fontFamily="ShowcaseSans" letterSpacing={0} lineHeight={1.6}>
+        <span key={sel} className="ceremony-swap">
+          {c.dateLine}
+          <div>{c.lunarTime}</div>
+        </span>
       </TextNode>
-      <TextNode id="6MrIeBGLUQ" top={6718} left={152.7} width={266.9} anim="slide-up" delay={0} justify="flex-start" align="left" color="#ffffff" fontSize={18} fontFamily="PlayfairDisplay" letterSpacing={0}>
+      <TextNode id="6MrIeBGLUQ" top={6718} left={152.7} width={266.9} anim="slide-up" delay={0} justify="flex-start" align="left" color="#ffffff" fontSize={18} fontFamily="ShowcaseSans" letterSpacing={0}>
         <a
-          href="https://www.google.com/maps/search/?api=1&query=Caravelle+Saigon+Hotel+19-23+Cong+Truong+Lam+Son+Quan+1"
+          href={c.addrHref}
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: 'inherit', textDecoration: 'underline', pointerEvents: 'auto', cursor: 'pointer' }}
         >
-          Khách sạn Caravelle, Tầng 3,&nbsp;<div>Sảnh BallRoom</div>
+          <span key={sel} className="ceremony-swap">
+            {c.addrL1}&nbsp;<div>{c.addrL2}</div>
+          </span>
         </a>
       </TextNode>
       {/* Embedded interactive map of the venue. Sits in the band opened up by
           shifting the RSVP form + Closing section down (+380px). */}
       <PNode id="venue-map" top={6820} left={37} width={426} height={360} anim="slide-up" delay={0.2}>
-        <iframe
-          title="Bản đồ Khách sạn Caravelle"
-          src="https://www.google.com/maps?q=Caravelle+Saigon+Hotel,+19-23+Cong+Truong+Lam+Son,+Quan+1&output=embed"
-          style={{ width: '100%', height: '100%', border: 0, borderRadius: 12, display: 'block', pointerEvents: 'auto', filter: 'invert(90%) hue-rotate(180deg)' }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
+        <div key={sel} className="ceremony-swap" style={{ width: '100%', height: '100%' }}>
+          <iframe
+            title={c.mapTitle}
+            src={c.mapSrc}
+            style={{ width: '100%', height: '100%', border: 0, borderRadius: 12, display: 'block', pointerEvents: 'auto', filter: 'invert(90%) hue-rotate(180deg)' }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
+        </div>
       </PNode>
     </>
   );

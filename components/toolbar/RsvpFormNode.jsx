@@ -35,7 +35,7 @@ export function RsvpFormNode() {
             style={{ backgroundColor: '#e0e0e0', color: '#ffc368', boxShadow: '0px 2px 10px 0px rgba(0, 0, 0, 0.1)', borderRadius: '5px', padding: '16px', minHeight: '100%', width: '100%', fontSize: '12px', fontFamily: SCARLET, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'visible', border: '1px solid #e0e0e0' }}
           >
             <h3 style={{ marginBottom: '1.15em', color: '#ffc368', fontWeight: 500, fontFamily: SCARLET, fontSize: '18px', textAlign: 'center' }}>
-              Xác nhận tham dự
+              Tham dự Lễ cưới
             </h3>
             <form style={{ display: 'flex', flexDirection: 'column', gap: '1.15em' }}>
               <div>
@@ -49,7 +49,7 @@ export function RsvpFormNode() {
                 />
               </div>
               <div>
-                <label htmlFor="rsvp-attendance" style={labelStyle}>Bạn sẽ tham dự chứ?</label>
+                <label htmlFor="rsvp-attendance" style={labelStyle}>Bạn sẽ tham dự lễ cưới chứ?</label>
                 <div className="ant-radio-group ant-radio-group-outline css-var-«R36» ant-radio-css-var" style={{ width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.57em' }}>
                     <label className="ant-radio-wrapper ant-radio-wrapper-checked css-var-«R36» ant-radio-css-var" style={radioWrapStyle}>

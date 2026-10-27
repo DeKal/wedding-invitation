@@ -13,6 +13,18 @@ import CeremonyStickyNote from './CeremonyStickyNote';
 // or ?event=le-vu-quy selects which one loads first.
 const EVENT_SLUG = ['le-cuoi', 'le-vu-quy'];
 
+// Build the iframe src for a ceremony's venue. Prefers the official Google Maps
+// Embed API (/maps/embed/v1/place), which is contractually framable and never
+// returns the cookie-consent interstitial that blocks the undocumented
+// ?output=embed endpoint (cause of intermittent net::ERR_BLOCKED_BY_RESPONSE,
+// especially in the Android WebView). Falls back to the legacy endpoint when no
+// API key is configured so local dev still renders a map.
+const MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const mapSrc = (query) =>
+  MAPS_KEY
+    ? `https://www.google.com/maps/embed/v1/place?key=${MAPS_KEY}&q=${encodeURIComponent(query)}&zoom=17`
+    : `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=17&output=embed`;
+
 const CEREMONIES = [
   {
     // Tiệc Cưới — wedding party at Caravelle
@@ -25,8 +37,7 @@ const CEREMONIES = [
     addrL1: 'Khách sạn Caravelle, Tầng 3,',
     addrL2: 'Sảnh BallRoom',
     mapTitle: 'Bản đồ Khách sạn Caravelle',
-    mapSrc:
-      'https://www.google.com/maps?q=Caravelle+Saigon+Hotel,+19-23+Cong+Truong+Lam+Son,+Quan+1&output=embed',
+    mapQuery: 'Caravelle Saigon Hotel, 19-23 Cong Truong Lam Son, Quan 1',
   },
   {
     // Lễ Vu Quy — rite at Thái Mỹ
@@ -38,7 +49,7 @@ const CEREMONIES = [
     addrL1: '18 Đường 656, Phước Hưng 1,',
     addrL2: 'X.Thái Mỹ, TP HCM',
     mapTitle: 'Bản đồ Lễ Vu Quy',
-    mapSrc: 'https://www.google.com/maps?q=11.010000,106.434417&z=17&output=embed',
+    mapQuery: '11.010000,106.434417',
   },
 ];
 
@@ -124,7 +135,7 @@ export default function InformationSection() {
         <div key={sel} className="ceremony-swap" style={{ width: '100%', height: '100%' }}>
           <iframe
             title={c.mapTitle}
-            src={c.mapSrc}
+            src={mapSrc(c.mapQuery)}
             style={{ width: '100%', height: '100%', border: 0, borderRadius: 12, display: 'block', pointerEvents: 'auto', filter: 'invert(90%) hue-rotate(180deg)' }}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

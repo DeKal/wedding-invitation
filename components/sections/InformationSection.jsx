@@ -8,10 +8,7 @@ import { useEffect, useState } from 'react';
 import PNode from '../nodes/PNode';
 import { CalendarNode, PhotoNode, TextNode } from '../nodes';
 import CeremonyStickyNote from './CeremonyStickyNote';
-
-// URL slug per ceremony, index-aligned with CEREMONIES. ?event=le-cuoi (default)
-// or ?event=le-vu-quy selects which one loads first.
-const EVENT_SLUG = ['le-cuoi', 'le-vu-quy'];
+import { EVENT_SLUG, EVENT_PATH } from '../../lib/ceremonyMeta';
 
 // Build the iframe src for a ceremony's venue. Prefers the official Google Maps
 // Embed API (/maps/embed/v1/place), which is contractually framable and never
@@ -53,11 +50,13 @@ const CEREMONIES = [
   },
 ];
 
-export default function InformationSection() {
-  const [sel, setSel] = useState(0);
+export default function InformationSection({ initialCeremony = 0 }) {
+  const [sel, setSel] = useState(initialCeremony);
   const c = CEREMONIES[sel];
 
-  // Load the ceremony named in ?event= on first mount (default le-cuoi = 0).
+  // Backward compatibility with the old query-param links (e.g.
+  // /?event=le-vu-quy): if ?event= names a ceremony, it overrides the route's
+  // initial selection on mount. New links use the paths (/ and /le-vu-quy).
   useEffect(() => {
     try {
       const p = (new URLSearchParams(window.location.search).get('event') || '').toLowerCase();
@@ -66,13 +65,17 @@ export default function InformationSection() {
     } catch (_) {}
   }, []);
 
-  // Toggle + keep the URL's ?event= in sync so the current view is shareable.
+  // Toggle + keep the URL path in sync (/ for Lễ Cưới, /le-vu-quy for Lễ Vu Quy)
+  // so the current view is shareable. replaceState (not a route push) swaps the
+  // path without a reload, so client state, audio and scroll position are
+  // preserved.
   const toggle = () =>
     setSel((s) => {
       const n = (s + 1) % CEREMONIES.length;
       try {
         const u = new URL(window.location.href);
-        u.searchParams.set('event', EVENT_SLUG[n]);
+        u.pathname = EVENT_PATH[n];
+        u.searchParams.delete('event'); // drop the legacy param if present
         window.history.replaceState({}, '', u);
       } catch (_) {}
       return n;

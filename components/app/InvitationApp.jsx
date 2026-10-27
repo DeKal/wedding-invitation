@@ -21,7 +21,7 @@ import {
 // triggered hydration mismatch (React #418/#423). It is purely client-interactive
 // (IntersectionObserver reveal, auto-scroll, audio, toolbar scripts), so SSR adds
 // nothing. The 500x9578 canvas keeps its full height so positions/scroll match.
-export default function InvitationApp() {
+export default function InvitationApp({ initialCeremony = 0 }) {
   useInvitationBehaviour();
   useToolbar();
 
@@ -53,7 +53,7 @@ export default function InvitationApp() {
                     <LoveLetterSection />
                     <MarriedSection />
                     <GallerySection />
-                    <InformationSection />
+                    <InformationSection initialCeremony={initialCeremony} />
                     <ClosingSection />
                     <RsvpFormNode />
                   </div>
